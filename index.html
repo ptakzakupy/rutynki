@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rutynki ⭐</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#58CC02;--green-d:#4CAD02;--green-l:#7CE830;
+  --gold:#FFC800;--gold-d:#E5A500;
+  --blue:#1CB0F6;--blue-d:#1899D6;
+  --purple:#CE82FF;--purple-d:#A855F7;
+  --red:#FF4B4B;--red-d:#EA2B2B;
+  --orange:#FF9600;
+  --skip:#6B7280;--skip-bg:#374151;
+  --bg:#131F24;--bg2:#1A2C32;--bg3:#253D45;
+  --card:#1F3640;--card2:#253D45;
+  --text:#FFF;--text2:#89CFF0;--text3:#5C8999;
+  --radius:16px;--radius-sm:12px;
+}
+html{background:var(--bg)}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100dvh;overflow-x:hidden;padding-bottom:80px;
+  max-width:540px;margin:0 auto;position:relative;
+}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;position:sticky;top:0;z-index:50;
+  background:var(--bg);border-bottom:2px solid var(--bg2);
+}
+.level-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:18px;color:#fff;
+  box-shadow:0 3px 12px rgba(255,200,0,0.3);
+  flex-shrink:0;cursor:pointer;position:relative;
+}
+.level-circle::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:3px solid var(--gold);opacity:0.4}
+.xp-section{flex:1;min-width:0}
+.xp-label{font-size:11px;font-weight:800;color:var(--text3);margin-bottom:3px;display:flex;justify-content:space-between}
+.xp-bar{height:14px;background:var(--bg3);border-radius:7px;overflow:hidden}
+.xp-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--gold),var(--orange));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+.streak-pill{
+  display:flex;align-items:center;gap:4px;
+  background:var(--card);padding:6px 12px;border-radius:50px;
+  font-weight:800;font-size:14px;cursor:pointer;flex-shrink:0;
+  border:2px solid var(--orange);color:var(--orange);
+}
+.streak-pill .fire{font-size:18px;animation:flameDance 0.6s ease infinite alternate}
+@keyframes flameDance{0%{transform:scale(1) rotate(-5deg)}100%{transform:scale(1.15) rotate(5deg)}}
+.gems-pill{
+  display:flex;align-items:center;gap:4px;
+  background:var(--card);padding:6px 12px;border-radius:50px;
+  font-weight:800;font-size:14px;cursor:pointer;flex-shrink:0;
+  border:2px solid var(--blue);color:var(--blue);
+}
+
+/* ============ MASCOT ============ */
+.mascot-wrap{
+  position:fixed;bottom:90px;right:12px;z-index:60;
+  pointer-events:none;transition:all 0.3s;
+}
+.mascot-wrap.hidden{opacity:0;transform:translateY(20px)}
+.mascot{
+  width:64px;height:64px;position:relative;
+  animation:mascotBounce 2s ease infinite;pointer-events:auto;cursor:pointer;
+}
+@keyframes mascotBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.mascot-body{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#A78BFA,#7C3AED);
+  position:absolute;bottom:0;left:4px;
+  box-shadow:0 4px 16px rgba(124,58,237,0.4);
+}
+.mascot-eye{width:14px;height:16px;background:#fff;border-radius:50%;position:absolute;top:14px}
+.mascot-eye::after{content:'';width:8px;height:8px;background:#1e1b4b;border-radius:50%;position:absolute;bottom:2px;left:3px}
+.mascot-eye.left{left:10px}.mascot-eye.right{right:10px}
+.mascot-mouth{width:16px;height:8px;border-radius:0 0 10px 10px;background:#1e1b4b;position:absolute;bottom:12px;left:20px}
+.mascot-blush{width:10px;height:6px;border-radius:50%;background:rgba(255,150,150,0.5);position:absolute;bottom:16px}
+.mascot-blush.l{left:4px}.mascot-blush.r{right:4px}
+.mascot.excited .mascot-body{animation:mascotJump 0.4s ease 3}
+@keyframes mascotJump{0%,100%{transform:scale(1)}50%{transform:scale(1.15) translateY(-8px)}}
+.mascot.excited .mascot-mouth{width:20px;height:14px;border-radius:0 0 12px 12px;left:18px;bottom:10px}
+.speech-bubble{
+  position:absolute;bottom:68px;right:0;background:white;color:#1e1b4b;
+  padding:8px 14px;border-radius:14px 14px 4px 14px;
+  font-size:13px;font-weight:700;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  opacity:0;transform:scale(0.8) translateY(10px);
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
+}
+.speech-bubble.show{opacity:1;transform:scale(1) translateY(0)}
+
+/* ============ NAV ============ */
+.nav{
+  display:flex;justify-content:space-around;
+  background:var(--bg2);position:fixed;bottom:0;left:0;right:0;z-index:100;
+  padding:6px 0 max(6px,env(safe-area-inset-bottom));
+  max-width:540px;margin:0 auto;border-top:2px solid var(--bg3);
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:6px 12px;cursor:pointer;font-size:10px;font-weight:800;
+  color:var(--text3);transition:all 0.2s;-webkit-tap-highlight-color:transparent;border-radius:10px;
+}
+.nav-item.active{color:var(--green)}
+.nav-item .ni{font-size:22px;height:26px;display:flex;align-items:center}
+
+/* ============ VIEWS ============ */
+.view{display:none;padding:16px;position:relative;z-index:1}
+.view.active{display:block}
+.section-title{font-size:20px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* ============ DAILY SUMMARY ============ */
+.daily-summary{
+  background:linear-gradient(135deg,var(--card),var(--card2));
+  border-radius:var(--radius);padding:16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:16px;border:2px solid var(--bg3);
+}
+.ds-ring{position:relative;width:70px;height:70px;flex-shrink:0}
+.ds-ring svg{transform:rotate(-90deg)}
+.ds-ring-bg{fill:none;stroke:var(--bg3);stroke-width:8}
+.ds-ring-fill{fill:none;stroke:var(--green);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease}
+.ds-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;font-weight:900}
+.ds-info{flex:1}
+.ds-title{font-size:15px;font-weight:900;margin-bottom:4px}
+.ds-sub{font-size:12px;color:var(--text3);font-weight:700}
+
+/* ============ COMBO BAR ============ */
+.combo-bar{
+  position:sticky;top:70px;z-index:40;
+  background:var(--card);border-radius:var(--radius-sm);
+  padding:10px 16px;margin-bottom:10px;
+  display:none;align-items:center;gap:10px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.2);border:2px solid var(--orange);
+  animation:comboGlow 1s ease infinite alternate;
+}
+@keyframes comboGlow{0%{box-shadow:0 4px 16px rgba(255,150,0,0.2)}100%{box-shadow:0 4px 24px rgba(255,150,0,0.5)}}
+.combo-bar.active{display:flex}
+.combo-text{font-weight:900;font-size:16px;color:var(--orange)}
+.combo-mult{margin-left:auto;font-weight:900;font-size:22px;color:var(--gold);animation:comboPulse 0.5s ease infinite alternate}
+@keyframes comboPulse{0%{transform:scale(1)}100%{transform:scale(1.15)}}
+
+/* ============ PATH TRACK (card-based) ============ */
+.path-track{position:relative;padding-left:28px}
+.path-track::before{
+  content:'';position:absolute;left:13px;top:0;bottom:0;width:4px;
+  background:var(--bg3);border-radius:2px;
+}
+.path-cat{
+  position:relative;padding:12px 0 8px;
+}
+.path-cat-label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:14px;font-weight:900;color:var(--text2);
+  background:var(--bg);padding:2px 10px 2px 0;position:relative;z-index:1;
+}
+.path-cat-count{
+  font-size:11px;font-weight:800;color:var(--text3);
+  background:var(--bg3);padding:2px 8px;border-radius:10px;
+}
+
+/* Task card on path */
+.path-task{
+  position:relative;display:flex;align-items:stretch;
+  margin-bottom:8px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+/* Dot on the line */
+.path-dot{
+  position:absolute;left:-22px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;border-radius:50%;
+  background:var(--bg2);border:3px solid var(--bg3);
+  z-index:2;transition:all 0.3s;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;
+}
+.path-task.done .path-dot{background:var(--green);border-color:var(--green-d);box-shadow:0 0 10px rgba(88,204,2,0.4)}
+.path-task.skipped .path-dot{background:var(--skip-bg);border-color:var(--skip)}
+
+/* The card itself */
+.path-card{
+  flex:1;display:flex;align-items:center;gap:12px;
+  background:var(--card);border:2px solid var(--bg3);
+  border-radius:var(--radius-sm);padding:12px 14px;
+  transition:all 0.2s;
+}
+.path-task:active .path-card{transform:scale(0.98)}
+.path-task.done .path-card{
+  border-color:var(--green-d);background:rgba(88,204,2,0.08);
+}
+.path-task.skipped .path-card{
+  border-color:var(--skip-bg);background:rgba(107,114,128,0.06);
+  opacity:0.55;
+}
+.path-task-icon{font-size:26px;flex-shrink:0;width:36px;text-align:center}
+.path-task-info{flex:1;min-width:0}
+.path-task-name{font-weight:800;font-size:15px;line-height:1.2}
+.path-task-xp{font-size:12px;color:var(--gold);font-weight:800;margin-top:1px}
+.path-task.done .path-task-name{text-decoration:line-through;opacity:0.7}
+.path-task.skipped .path-task-name{text-decoration:line-through;color:var(--skip)}
+.path-task.skipped .path-task-xp{color:var(--skip)}
+
+/* Action buttons */
+.path-actions{display:flex;gap:6px;flex-shrink:0;align-items:center}
+.btn-complete{
+  width:42px;height:42px;border-radius:50%;border:3px solid var(--green);
+  background:transparent;color:var(--green);font-size:18px;font-weight:900;
+  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;
+}
+.btn-complete:hover{background:rgba(88,204,2,0.15)}
+.path-task.done .btn-complete{background:var(--green);color:#fff;border-color:var(--green-d)}
+.btn-skip{
+  padding:6px 10px;border-radius:8px;border:2px solid var(--bg3);
+  background:transparent;color:var(--text3);font-size:11px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;font-family:inherit;
+  white-space:nowrap;
+}
+.btn-skip:hover{border-color:var(--skip);color:var(--skip)}
+.path-task.skipped .btn-skip{background:var(--skip-bg);color:var(--text3);border-color:var(--skip)}
+.path-task.done .btn-skip{display:none}
+
+/* Chest */
+.chest-area{
+  text-align:center;padding:20px 0 10px;position:relative;
+}
+.chest-icon{font-size:56px;filter:drop-shadow(0 6px 16px rgba(255,200,0,0.3))}
+.chest-icon.unlocked{animation:chestFloat 2s ease infinite alternate;cursor:pointer}
+@keyframes chestFloat{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}
+.chest-icon.locked{filter:grayscale(0.6) brightness(0.5)}
+.chest-icon.opened{filter:none;animation:none}
+.chest-label{font-size:13px;font-weight:800;margin-top:6px}
+.chest-label.clr-gold{color:var(--gold)}
+.chest-label.clr-gray{color:var(--text3)}
+.chest-label.clr-green{color:var(--green)}
+.chest-progress{
+  display:flex;align-items:center;gap:8px;justify-content:center;
+  margin-top:8px;font-size:12px;color:var(--text3);font-weight:700;
+}
+.chest-pbar{width:120px;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.chest-pbar-fill{height:100%;background:var(--gold);border-radius:4px;transition:width 0.5s}
+
+/* ============ QUESTS ============ */
+.quest-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:10px;border:2px solid var(--bg3);
+  display:flex;align-items:center;gap:14px;transition:all 0.3s;
+}
+.quest-card.completed{border-color:var(--green);background:rgba(88,204,2,0.08)}
+.quest-icon{font-size:32px;flex-shrink:0}
+.quest-info{flex:1}
+.quest-name{font-weight:800;font-size:14px;margin-bottom:2px}
+.quest-desc{font-size:12px;color:var(--text3);font-weight:600}
+.quest-progress{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:6px}
+.quest-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--green-l));transition:width 0.5s}
+.quest-reward{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0}
+.quest-reward-val{font-weight:900;font-size:14px;color:var(--gold)}
+.quest-reward-label{font-size:10px;color:var(--text3);font-weight:700}
+
+/* ============ SHOP ============ */
+.shop-balance{background:linear-gradient(135deg,var(--blue),var(--blue-d));border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center;color:#fff}
+.shop-balance-val{font-size:36px;font-weight:900}
+.shop-balance-label{font-size:13px;font-weight:700;opacity:0.8}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.shop-item{
+  background:var(--card);border-radius:var(--radius);padding:16px;text-align:center;
+  border:2px solid var(--bg3);cursor:pointer;transition:all 0.2s;
+}
+.shop-item:hover{border-color:var(--blue);transform:translateY(-2px)}
+.shop-item:active{transform:scale(0.97)}
+.shop-item.cant{opacity:0.4;cursor:not-allowed}
+.shop-item.cant:hover{border-color:var(--bg3);transform:none}
+.shop-item-icon{font-size:36px;margin-bottom:6px}
+.shop-item-name{font-weight:800;font-size:13px;margin-bottom:4px}
+.shop-item-cost{display:inline-flex;align-items:center;gap:3px;font-weight:900;font-size:13px;color:var(--blue);background:rgba(28,176,246,0.1);padding:3px 10px;border-radius:20px}
+.shop-item-desc{font-size:11px;color:var(--text3);font-weight:600;margin-top:4px}
+.shop-sub{font-size:16px;font-weight:900;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
+.real-reward{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border:2px solid var(--bg3)}
+.rr-icon{font-size:30px}
+.rr-info{flex:1}
+.rr-name{font-weight:800;font-size:14px}
+.rr-cost{font-size:12px;color:var(--gold);font-weight:800;display:flex;align-items:center;gap:3px}
+.rr-btn{padding:8px 16px;border-radius:50px;border:none;font-family:inherit;font-weight:800;font-size:12px;cursor:pointer}
+.rr-btn.can{background:var(--gold);color:#000}
+.rr-btn.nope{background:var(--bg3);color:var(--text3);cursor:not-allowed}
+
+/* ============ STATS ============ */
+.stat-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:10px;border:2px solid var(--bg3)}
+.stat-header{font-size:16px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sg-item{text-align:center;padding:12px;background:var(--bg2);border-radius:var(--radius-sm)}
+.sg-val{font-size:22px;font-weight:900}
+.sg-label{font-size:11px;color:var(--text3);font-weight:700;margin-top:2px}
+.sg-val.g{color:var(--green)}.sg-val.o{color:var(--gold)}.sg-val.b{color:var(--blue)}.sg-val.p{color:var(--purple)}
+.cal-month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-btn{background:var(--bg3);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.cal-month-title{font-weight:900;font-size:16px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+.cal-dn{text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px 0}
+.cal-d{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;cursor:pointer;transition:all 0.2s}
+.cal-d.empty{cursor:default}
+.cal-d.today{border:2px solid var(--gold)}
+.cal-d.l0{background:var(--bg2)}.cal-d.l1{background:#1a3a1a;color:#86efac}
+.cal-d.l2{background:#1d4a1d;color:#4ade80}.cal-d.l3{background:#22662b;color:#fff}
+.cal-d.l4{background:var(--green);color:#fff}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ach-card{background:var(--card);border-radius:var(--radius);padding:14px;text-align:center;border:2px solid var(--bg3);transition:all 0.3s;overflow:hidden}
+.ach-card.locked{opacity:0.35;filter:grayscale(0.5)}
+.ach-card.unlocked{border-color:var(--gold)}
+.ach-icon{font-size:32px;margin-bottom:4px}
+.ach-name{font-weight:800;font-size:12px;margin-bottom:2px}
+.ach-desc{font-size:11px;color:var(--text3);font-weight:600}
+.ach-date{font-size:10px;color:var(--green);font-weight:700;margin-top:4px}
+.ach-prog{height:5px;background:var(--bg3);border-radius:3px;margin-top:6px;overflow:hidden}
+.ach-prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:3px;transition:width 0.5s}
+
+/* ============ SETTINGS ============ */
+.sett-section{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:2px solid var(--bg3)}
+.sett-title{font-size:16px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sett-cat-title{font-size:12px;font-weight:800;color:var(--text3);margin:10px 0 6px}
+.sett-item{display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:4px}
+.sett-item-icon{font-size:18px}
+.sett-item-name{flex:1;font-weight:700;font-size:13px}
+.sett-item-pts{font-size:12px;color:var(--gold);font-weight:800}
+.del-btn{background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px 8px;border-radius:8px}
+.del-btn:hover{background:rgba(255,75,75,0.1)}
+.add-btn{width:100%;padding:12px;margin-top:8px;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
+.add-btn:hover{filter:brightness(1.1)}
+.reset-btn{width:100%;padding:12px;margin-top:8px;background:rgba(255,75,75,0.1);color:var(--red);border:2px solid var(--red);border-radius:var(--radius-sm);font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
+.sound-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.toggle-sw{width:50px;height:28px;border-radius:14px;background:var(--bg3);cursor:pointer;position:relative;transition:background 0.2s;border:none}
+.toggle-sw.on{background:var(--green)}
+.toggle-sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform 0.2s}
+.toggle-sw.on::after{transform:translateX(22px)}
+
+/* ============ OVERLAYS ============ */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);justify-content:center;align-items:center;padding:20px}
+.overlay.active{display:flex}
+.overlay-content{background:var(--card);border-radius:24px;padding:32px;text-align:center;max-width:360px;width:100%;animation:overlayPop 0.5s cubic-bezier(0.34,1.56,0.64,1);border:2px solid var(--bg3)}
+@keyframes overlayPop{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.ov-emoji{font-size:60px;margin-bottom:12px}
+.ov-title{font-size:22px;font-weight:900;margin-bottom:6px}
+.ov-text{font-size:14px;color:var(--text3);font-weight:600;margin-bottom:20px;line-height:1.5}
+.ov-btn{padding:14px 36px;border-radius:50px;border:none;font-family:inherit;font-weight:900;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--green),var(--green-d));box-shadow:0 4px 16px rgba(88,204,2,0.3);transition:transform 0.2s}
+.ov-btn:hover{transform:scale(1.05)}
+.ov-btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold-d));box-shadow:0 4px 16px rgba(255,200,0,0.3)}
+.level-up-badge{width:100px;height:100px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;box-shadow:0 8px 32px rgba(255,200,0,0.4);animation:levelBadgePulse 1s ease infinite alternate}
+@keyframes levelBadgePulse{0%{box-shadow:0 8px 32px rgba(255,200,0,0.3)}100%{box-shadow:0 8px 48px rgba(255,200,0,0.6)}}
+.level-title{font-size:14px;color:var(--gold);font-weight:800;margin-bottom:4px}
+.chest-open{font-size:80px;animation:chestShake 0.5s ease 2,chestOpen 0.5s ease 1s forwards}
+@keyframes chestShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+@keyframes chestOpen{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1.1)}}
+.chest-rewards{display:flex;justify-content:center;gap:16px;margin:16px 0;animation:chestRewardsReveal 0.5s ease 1.5s both}
+@keyframes chestRewardsReveal{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+.chest-rw{background:var(--bg2);padding:10px 16px;border-radius:12px;text-align:center}
+.chest-rw-val{font-weight:900;font-size:18px}
+.chest-rw-label{font-size:11px;color:var(--text3);font-weight:700}
+.streak-fire-big{font-size:64px;animation:flameDance 0.6s ease infinite alternate}
+.streak-days{display:flex;justify-content:center;gap:6px;margin:16px 0}
+.streak-day{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:var(--bg2);border:2px solid var(--bg3)}
+.streak-day.active{background:var(--orange);border-color:var(--orange);color:#fff}
+.streak-day.today{border-color:var(--gold);box-shadow:0 0 12px rgba(255,200,0,0.4)}
+
+/* ============ MODAL ============ */
+.modal-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);justify-content:center;align-items:flex-end}
+.modal-bg.active{display:flex}
+.modal-box{background:var(--card);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:540px;max-height:80vh;overflow-y:auto;animation:slideUp 0.3s ease;border:2px solid var(--bg3);border-bottom:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:16px;text-align:center}
+.modal-field{margin-bottom:12px}
+.modal-field label{display:block;font-weight:700;font-size:12px;color:var(--text3);margin-bottom:4px}
+.modal-field input,.modal-field select{width:100%;padding:12px;background:var(--bg2);border:2px solid var(--bg3);color:var(--text);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:600;outline:none}
+.modal-field input:focus,.modal-field select:focus{border-color:var(--green)}
+.modal-field select option{background:var(--bg2);color:var(--text)}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.modal-btns button{flex:1;padding:14px;border-radius:14px;border:none;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.mbtn-cancel{background:var(--bg3);color:var(--text)}
+.mbtn-save{background:var(--green);color:#fff}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:2px}
+.emoji-opt{font-size:20px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:8px;transition:background 0.2s}
+.emoji-opt:hover{background:var(--bg3)}
+.emoji-opt.sel{background:var(--bg3);outline:2px solid var(--green)}
+
+/* ============ FX ============ */
+.confetti-box{position:fixed;inset:0;pointer-events:none;z-index:250;overflow:hidden}
+.confetti-p{position:absolute;border-radius:2px;animation:confFall linear forwards}
+@keyframes confFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.pt-pop{position:fixed;z-index:210;font-size:22px;font-weight:900;pointer-events:none;animation:ptFloat 1.2s ease forwards;text-shadow:0 2px 8px rgba(0,0,0,0.3);color:var(--gold)}
+@keyframes ptFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-70px) scale(1.4)}}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card);color:var(--text);border:2px solid var(--bg3);padding:10px 24px;border-radius:50px;font-weight:700;font-size:13px;z-index:400;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ============ iPAD & RESPONSIVE ============ */
+@media(min-width:600px){
+  .path-card{padding:16px 18px}
+  .path-task-name{font-size:17px}
+  .path-task-icon{font-size:30px;width:42px}
+  .btn-complete{width:48px;height:48px;font-size:20px}
+  .btn-skip{padding:8px 14px;font-size:12px}
+  .daily-summary{padding:20px}
+  .ds-ring{width:80px;height:80px}
+  .ds-pct{font-size:24px}
+}
+@media(min-width:768px){
+  body{max-width:600px}
+  .nav{max-width:600px}
+  .modal-box{max-width:600px}
+  .path-task-name{font-size:18px}
+  .path-task-icon{font-size:32px;width:46px}
+  .topbar{padding:14px 20px}
+  .view{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="level-circle" id="levelCircle" onclick="showLevelInfo()"></div>
+  <div class="xp-section">
+    <div class="xp-label"><span id="xpLevelName"></span><span id="xpText"></span></div>
+    <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+  </div>
+  <div class="streak-pill" id="streakPill" onclick="showStreakPopup()">
+    <span class="fire">🔥</span><span id="streakNum">0</span>
+  </div>
+  <div class="gems-pill" onclick="switchView('viewShop')">💎 <span id="gemsNum">0</span></div>
+</div>
+
+<!-- VIEWS -->
+<div class="view active" id="viewPath"></div>
+<div class="view" id="viewQuests"></div>
+<div class="view" id="viewShop"></div>
+<div class="view" id="viewStats"></div>
+<div class="view" id="viewSettings"></div>
+
+<!-- MASCOT -->
+<div class="mascot-wrap" id="mascotWrap">
+  <div class="speech-bubble" id="speechBubble"></div>
+  <div class="mascot" id="mascot" onclick="mascotTap()">
+    <div class="mascot-body">
+      <div class="mascot-eye left"></div>
+      <div class="mascot-eye right"></div>
+      <div class="mascot-mouth"></div>
+      <div class="mascot-blush l"></div>
+      <div class="mascot-blush r"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-item active" data-view="viewPath"><span class="ni">🗺️</span>Przygoda</div>
+  <div class="nav-item" data-view="viewQuests"><span class="ni">⚔️</span>Misje</div>
+  <div class="nav-item" data-view="viewShop"><span class="ni">💎</span>Sklep</div>
+  <div class="nav-item" data-view="viewStats"><span class="ni">📊</span>Statsy</div>
+  <div class="nav-item" data-view="viewSettings"><span class="ni">⚙️</span>Opcje</div>
+</nav>
+
+<!-- OVERLAYS -->
+<div class="overlay" id="ovLevel"><div class="overlay-content" id="ovLevelContent"></div></div>
+<div class="overlay" id="ovChest"><div class="overlay-content" id="ovChestContent"></div></div>
+<div class="overlay" id="ovAch"><div class="overlay-content" id="ovAchContent"></div></div>
+<div class="overlay" id="ovStreak"><div class="overlay-content" id="ovStreakContent"></div></div>
+<div class="overlay" id="ovGeneral"><div class="overlay-content" id="ovGeneralContent"></div></div>
+<div class="confetti-box" id="confBox"></div>
+<div class="toast" id="toast"></div>
+<div class="modal-bg" id="modalBg"><div class="modal-box" id="modalBox"></div></div>
+
+<script>
+// ============================================
+// RUTYNKI v2.1 — CORE ENGINE
+// ============================================
+const SK='rutynki_v2';
+const MPL=['Styczen','Luty','Marzec','Kwiecien','Maj','Czerwiec','Lipiec','Sierpien','Wrzesien','Pazdziernik','Listopad','Grudzien'];
+const DPL=['Pn','Wt','Sr','Cz','Pt','So','Nd'];
+function dk(d){d=d||new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+// ---- Levels ----
+const LEVELS=[
+  {name:'Zoltodziob',min:0},{name:'Odkrywca',min:200},{name:'Tropiciel',min:500},
+  {name:'Wojownik',min:900},{name:'Rycerz',min:1400},{name:'Bohater',min:2000},
+  {name:'Mistrz',min:3000},{name:'Legenda',min:4500},{name:'Smok',min:6500},
+  {name:'Kosmiczny Kapitan',min:9000},{name:'Galaktyczny Cesarz',min:12000}
+];
+function getLevel(xp){let l=0;for(let i=LEVELS.length-1;i>=0;i--)if(xp>=LEVELS[i].min){l=i;break}return l}
+function getLevelInfo(xp){
+  const l=getLevel(xp),cur=LEVELS[l],next=LEVELS[l+1]||{min:cur.min+3000};
+  const inL=xp-cur.min,need=next.min-cur.min;
+  return{level:l+1,name:cur.name,xp:inL,needed:need,pct:Math.min(100,Math.round(inL/need*100)),totalXp:xp}
+}
+
+// ---- Sounds ----
+let soundOn=true;
+function playSound(type){
+  if(!soundOn)return;
+  try{
+    const ac=new(window.AudioContext||window.webkitAudioContext)(),g=ac.createGain();
+    g.connect(ac.destination);g.gain.setValueAtTime(0.15,ac.currentTime);const t=ac.currentTime;
+    if(type==='done'){
+      [523,659,784].forEach((f,i)=>{const o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(f,t+i*0.1);o.connect(g);o.start(t+i*0.1);o.stop(t+i*0.1+0.15)});
+      g.gain.exponentialRampToValueAtTime(0.01,t+0.5);
+    }else if(type==='combo'){
+      [523,587,659,698,784].forEach((f,i)=>{const o=ac.createOscillator();o.type='square';o.frequency.setValueAtTime(f,t+i*0.06);o.connect(g);o.start(t+i*0.06);o.stop(t+i*0.06+0.08)});
+    }else if(type==='levelup'){
+      g.gain.setValueAtTime(0.2,t);
+      [523,659,784,1047].forEach((f,i)=>{const o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(f,t+i*0.15);o.connect(g);o.start(t+i*0.15);o.stop(t+i*0.15+0.3)});
+    }else if(type==='chest'){
+      [392,523,659,784,1047].forEach((f,i)=>{const o=ac.createOscillator();o.type='triangle';o.frequency.setValueAtTime(f,t+i*0.12);o.connect(g);o.start(t+i*0.12);o.stop(t+i*0.12+0.2)});
+    }else if(type==='skip'){
+      const o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(400,t);o.frequency.setValueAtTime(300,t+0.1);o.connect(g);o.start(t);o.stop(t+0.15);
+    }else if(type==='click'){
+      const o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(800,t);o.connect(g);o.start(t);o.stop(t+0.05);
+    }
+  }catch(e){}
+}
+
+// ---- Mascot ----
+const MSGS_E=['Super robota! 💪','Nie zatrzymuj sie!','Jestes na fali! 🌊','Tak trzymaj! ⚡','Mega! 🚀','Brawo! 👏','Bomba! 💣'];
+const MSGS_G=['Hej! Gotowy na przygode? 🗺️','Czesc! Dzis bedzie super!','Nowy dzien, nowe wyzwania!','Siema! Ruszamy! 🚀'];
+const MSGS_I=['Hej, pamietasz o zadaniach? 😊','Klik klik! Czekam!','Mozesz to zrobic! 💪'];
+const MSGS_C=['COMBO! 🔥🔥🔥','Seria!!! Nie przerywaj!','Niesamowite tempo! ⚡'];
+const MSGS_S=['Nic sie nie stalo!','Wrocisz do tego jutro 😊','OK, lecimy dalej!','Nie kazdy dzien jest taki sam 💙'];
+
+let speechTO=null;
+function mascotSay(msg,dur){const b=$('speechBubble');b.textContent=msg;b.classList.add('show');clearTimeout(speechTO);speechTO=setTimeout(()=>b.classList.remove('show'),dur||3000)}
+function mascotExpr(expr,dur){const m=$('mascot');m.className='mascot '+expr;if(dur)setTimeout(()=>m.className='mascot',dur)}
+function mascotTap(){mascotExpr('excited',800);mascotSay([...MSGS_E,...MSGS_I][Math.floor(Math.random()*(MSGS_E.length+MSGS_I.length))],2500);playSound('click')}
+function $(id){return document.getElementById(id)}
+
+// ---- Default data ----
+function defaults(){return{
+  routines:[
+    {id:'r1',name:'Umyc zeby',icon:'🪥',cat:'morning',pts:5},
+    {id:'r2',name:'Poscielenie lozka',icon:'🛏️',cat:'morning',pts:5},
+    {id:'r3',name:'Ubranie sie',icon:'👕',cat:'morning',pts:3},
+    {id:'r4',name:'Sniadanie',icon:'🥣',cat:'morning',pts:5},
+    {id:'r5',name:'Spakowanie plecaka',icon:'🎒',cat:'morning',pts:5},
+    {id:'r6',name:'Odrobienie lekcji',icon:'📚',cat:'afternoon',pts:15},
+    {id:'r7',name:'Czytanie 15 min',icon:'📖',cat:'afternoon',pts:10},
+    {id:'r8',name:'Sprzatanie pokoju',icon:'🧹',cat:'afternoon',pts:10},
+    {id:'r9',name:'Zabawa na dworze',icon:'⚽',cat:'afternoon',pts:10},
+    {id:'r10',name:'Kapiel / prysznic',icon:'🚿',cat:'evening',pts:5},
+    {id:'r11',name:'Umyc zeby (wieczor)',icon:'🪥',cat:'evening',pts:5},
+    {id:'r12',name:'Przygotowanie ubrania',icon:'👔',cat:'evening',pts:5},
+    {id:'r13',name:'Czytanie przed snem',icon:'📕',cat:'evening',pts:10},
+  ],
+  completions:{},skips:{},
+  rewards:[
+    {id:'w1',name:'Dodatkowe 30 min ekranu',icon:'📱',cost:50},
+    {id:'w2',name:'Wybor obiadu',icon:'🍕',cost:80},
+    {id:'w3',name:'Wieczor filmowy',icon:'🎬',cost:120},
+    {id:'w4',name:'Lody!',icon:'🍦',cost:60},
+    {id:'w5',name:'Wyjscie do parku',icon:'🏞️',cost:100},
+    {id:'w6',name:'Polozenie sie pozniej',icon:'🌙',cost:70},
+    {id:'w7',name:'Maly prezent',icon:'🎁',cost:200},
+  ],
+  rewardHistory:[],xp:0,gems:20,
+  streak:0,longestStreak:0,totalDone:0,
+  achievements:[],
+  comboCount:0,lastTaskTime:0,_maxCombo:0,_dayMaxCombo:0,_lastDay:'',
+  chestOpened:{},questsDone:{},
+  streakFreezes:0,xpBoostUntil:0,soundOn:true,
+}}
+
+// ---- Achievements ----
+const ACHS=[
+  {id:'a1',name:'Pierwszy krok!',desc:'Wykonaj pierwsze zadanie',icon:'👣',ck:d=>d.totalDone>=1,pg:d=>Math.min(d.totalDone,1),mx:1},
+  {id:'a2',name:'Pelny dzien!',desc:'Wykonaj wszystko w ciagu dnia',icon:'🌟',ck:d=>hasFullDay(d),pg:d=>bestDayPct(d),mx:100},
+  {id:'a3',name:'Seria 3 dni',desc:'3 dni z rzedu!',icon:'🔥',ck:d=>d.longestStreak>=3,pg:d=>Math.min(d.longestStreak,3),mx:3},
+  {id:'a4',name:'Seria 7 dni',desc:'Caly tydzien!',icon:'💪',ck:d=>d.longestStreak>=7,pg:d=>Math.min(d.longestStreak,7),mx:7},
+  {id:'a5',name:'Seria 14 dni',desc:'Dwa tygodnie mocy!',icon:'⚡',ck:d=>d.longestStreak>=14,pg:d=>Math.min(d.longestStreak,14),mx:14},
+  {id:'a6',name:'Seria 30 dni',desc:'Miesiac! Legenda!',icon:'👑',ck:d=>d.longestStreak>=30,pg:d=>Math.min(d.longestStreak,30),mx:30},
+  {id:'a7',name:'50 zadan',desc:'Wykonaj 50 zadan',icon:'📦',ck:d=>d.totalDone>=50,pg:d=>Math.min(d.totalDone,50),mx:50},
+  {id:'a8',name:'200 zadan',desc:'Wykonaj 200 zadan',icon:'🏅',ck:d=>d.totalDone>=200,pg:d=>Math.min(d.totalDone,200),mx:200},
+  {id:'a9',name:'500 zadan!',desc:'Poltysiecy!',icon:'🏆',ck:d=>d.totalDone>=500,pg:d=>Math.min(d.totalDone,500),mx:500},
+  {id:'a10',name:'Pierwsza nagroda',desc:'Odbierz nagrode',icon:'🎁',ck:d=>d.rewardHistory.length>=1,pg:d=>Math.min(d.rewardHistory.length,1),mx:1},
+  {id:'a11',name:'Ranny ptaszek',desc:'Poranki 5 dni z rzedu',icon:'🐦',ck:d=>mornStreak(d)>=5,pg:d=>Math.min(mornStreak(d),5),mx:5},
+  {id:'a12',name:'Skarbonka 1000',desc:'Zbierz 1000 XP',icon:'💰',ck:d=>d.xp>=1000,pg:d=>Math.min(d.xp,1000),mx:1000},
+  {id:'a13',name:'Kombo x3!',desc:'Zrob combo x3',icon:'🔥',ck:d=>d._maxCombo>=3,pg:d=>Math.min(d._maxCombo||0,3),mx:3},
+  {id:'a14',name:'Kombo x5!',desc:'Zrob combo x5!',icon:'⚡',ck:d=>d._maxCombo>=5,pg:d=>Math.min(d._maxCombo||0,5),mx:5},
+];
+function hasFullDay(d){const ids=d.routines.map(r=>r.id);for(const[,v]of Object.entries(d.completions))if(ids.length&&ids.every(id=>v.includes(id)))return true;return false}
+function bestDayPct(d){let b=0;const t=d.routines.length||1;for(const v of Object.values(d.completions)){const p=Math.round(v.length/t*100);if(p>b)b=p}return b}
+function mornStreak(d){const ids=d.routines.filter(r=>r.cat==='morning').map(r=>r.id);if(!ids.length)return 0;let s=0;const t=new Date();for(let i=0;i<365;i++){const dt=new Date(t);dt.setDate(dt.getDate()-i);const c=d.completions[dk(dt)]||[];if(ids.every(id=>c.includes(id)))s++;else break}return s}
+
+// ---- Daily Quests ----
+const QD=[
+  {id:'q1',name:'Poranny sprint',desc:'Wykonaj wszystkie poranne zadania',icon:'🌅',ck:(d,k)=>{const ids=d.routines.filter(r=>r.cat==='morning').map(r=>r.id);const c=d.completions[k]||[];return ids.length&&ids.every(id=>c.includes(id))},pg:(d,k)=>{const ids=d.routines.filter(r=>r.cat==='morning').map(r=>r.id);return(d.completions[k]||[]).filter(id=>ids.includes(id)).length},mx:d=>d.routines.filter(r=>r.cat==='morning').length||1,rew:15},
+  {id:'q2',name:'Wieczorny rytualist',desc:'Wykonaj wszystkie wieczorne',icon:'🌙',ck:(d,k)=>{const ids=d.routines.filter(r=>r.cat==='evening').map(r=>r.id);const c=d.completions[k]||[];return ids.length&&ids.every(id=>c.includes(id))},pg:(d,k)=>{const ids=d.routines.filter(r=>r.cat==='evening').map(r=>r.id);return(d.completions[k]||[]).filter(id=>ids.includes(id)).length},mx:d=>d.routines.filter(r=>r.cat==='evening').length||1,rew:15},
+  {id:'q3',name:'Polowa drogi',desc:'Wykonaj polowe zadan',icon:'⚡',ck:(d,k)=>(d.completions[k]||[]).length>=Math.ceil(d.routines.length/2),pg:(d,k)=>(d.completions[k]||[]).length,mx:d=>Math.ceil(d.routines.length/2)||1,rew:10},
+  {id:'q4',name:'Perfekcyjny dzien!',desc:'Wykonaj WSZYSTKIE zadania',icon:'🌟',ck:(d,k)=>{const c=d.completions[k]||[];return d.routines.length&&c.length>=d.routines.length},pg:(d,k)=>(d.completions[k]||[]).length,mx:d=>d.routines.length||1,rew:25},
+  {id:'q5',name:'Combo master',desc:'Zdobadz combo x3',icon:'🔥',ck:d=>(d._dayMaxCombo||0)>=3,pg:d=>Math.min(d._dayMaxCombo||0,3),mx:()=>3,rew:20},
+  {id:'q6',name:'Zrob trzy!',desc:'Wykonaj 3 dowolne zadania',icon:'✅',ck:(d,k)=>(d.completions[k]||[]).length>=3,pg:(d,k)=>(d.completions[k]||[]).length,mx:()=>3,rew:8},
+];
+function getDailyQuests(){
+  const s=dk().split('-').join('');let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i);h=Math.abs(h);
+  return[...QD].sort((a,b)=>((h*a.id.charCodeAt(1))%100)-((h*b.id.charCodeAt(1))%100)).slice(0,3);
+}
+
+// ---- State ----
+let D=load();
+let calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
+let comboTimer=null;
+
+function load(){
+  try{const r=localStorage.getItem(SK);if(r){const p=JSON.parse(r);const d=defaults();return{...d,...p,skips:p.skips||{}}}}catch(e){}
+  return defaults();
+}
+function save(){localStorage.setItem(SK,JSON.stringify(D))}
+
+// ---- Nav ----
+const PARENT_PIN='2137';
+let settingsUnlocked=false;
+
+document.querySelectorAll('.nav-item').forEach(n=>{n.addEventListener('click',()=>{switchView(n.dataset.view);playSound('click')})});
+function switchView(id){
+  if(id==='viewSettings'&&!settingsUnlocked){
+    showPinPrompt();
+    return;
+  }
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===id));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+  $('mascotWrap').classList.toggle('hidden',id==='viewSettings');
+  render(id);
+}
+function showPinPrompt(){
+  showModal(`
+    <div class="modal-title">🔒 Strefa rodzica</div>
+    <p style="text-align:center;color:var(--text3);font-weight:600;margin-bottom:16px;font-size:13px">Wpisz kod dostepu zeby zmienic ustawienia</p>
+    <div class="modal-field">
+      <label>Kod PIN</label>
+      <input type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" style="text-align:center;font-size:24px;letter-spacing:12px">
+    </div>
+    <div id="pinError" style="color:var(--red);font-size:12px;font-weight:700;text-align:center;min-height:18px"></div>
+    <div class="modal-btns">
+      <button class="mbtn-cancel" onclick="closeModal()">Anuluj</button>
+      <button class="mbtn-save" onclick="checkPin()">Wejdz 🔓</button>
+    </div>
+  `);
+  setTimeout(()=>{
+    const inp=$('pinInput');
+    if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')checkPin()})}
+  },100);
+}
+function checkPin(){
+  const val=$('pinInput').value;
+  if(val===PARENT_PIN){
+    settingsUnlocked=true;
+    closeModal();
+    playSound('chest');
+    switchView('viewSettings');
+    // Auto-lock after 5 minutes
+    setTimeout(()=>{settingsUnlocked=false},300000);
+  }else{
+    $('pinError').textContent='Zly kod! Sprobuj jeszcze raz';
+    $('pinInput').value='';
+    $('pinInput').focus();
+    playSound('skip');
+  }
+}
+function render(id){
+  switch(id){
+    case'viewPath':renderPath();break;case'viewQuests':renderQuests();break;
+    case'viewShop':renderShop();break;case'viewStats':renderStats();break;
+    case'viewSettings':renderSettings();break;
+  }
+}
+
+// ---- Topbar ----
+function updateTop(){
+  const li=getLevelInfo(D.xp);
+  $('levelCircle').textContent=li.level;
+  $('xpLevelName').textContent=li.name;
+  $('xpText').textContent=`${li.xp} / ${li.needed} XP`;
+  $('xpFill').style.width=li.pct+'%';
+  $('streakNum').textContent=D.streak;
+  $('streakPill').style.display=D.streak>0?'flex':'none';
+  $('gemsNum').textContent=D.gems;
+  soundOn=D.soundOn!==false;
+}
+
+// ---- Streak ----
+function calcStreak(){
+  let s=0;const t=new Date(),tk=dk(t);
+  const tc=D.completions[tk]||[];
+  const full=tc.length>=D.routines.length&&D.routines.length>0;
+  for(let i=(full?0:1);i<365;i++){
+    const dt=new Date(t);dt.setDate(dt.getDate()-i);
+    const c=D.completions[dk(dt)]||[];
+    if(c.length>=D.routines.length&&D.routines.length>0)s++;else break;
+  }
+  if(full)s=Math.max(s,1);
+  D.streak=s;if(s>D.longestStreak)D.longestStreak=s;save();
+}
+
+// ---- Combo ----
+const COMBO_MS=15000;
+function registerCombo(){
+  const now=Date.now();
+  D.comboCount=(now-D.lastTaskTime<COMBO_MS&&D.lastTaskTime>0)?D.comboCount+1:1;
+  D.lastTaskTime=now;
+  if(!D._maxCombo||D.comboCount>D._maxCombo)D._maxCombo=D.comboCount;
+  if(!D._dayMaxCombo||D.comboCount>D._dayMaxCombo)D._dayMaxCombo=D.comboCount;
+  clearTimeout(comboTimer);
+  comboTimer=setTimeout(()=>{D.comboCount=0;D.lastTaskTime=0;save();renderPath()},COMBO_MS);
+  if(D.comboCount>=3){playSound('combo');mascotExpr('excited',1200);mascotSay(MSGS_C[Math.floor(Math.random()*MSGS_C.length)],2500)}
+  save();return D.comboCount>=3?Math.min(D.comboCount,5):1;
+}
+
+// ==============================
+// PATH VIEW — card-based layout
+// ==============================
+function renderPath(){
+  const today=dk();
+  const comp=D.completions[today]||[];
+  const skips=D.skips[today]||[];
+  const total=D.routines.length;
+  const done=comp.length;
+  const skipped=skips.length;
+  const addressed=done+skipped;
+  const pct=total?Math.round(done/total*100):0;
+  const circ=2*Math.PI*28,off=circ-(pct/100)*circ;
+  const cats=[{k:'morning',l:'🌅 Poranek'},{k:'afternoon',l:'☀️ Popoludnie'},{k:'evening',l:'🌙 Wieczor'}];
+  const todayXP=getXPToday();
+
+  let html=`
+    <div class="daily-summary">
+      <div class="ds-ring">
+        <svg width="70" height="70"><circle class="ds-ring-bg" cx="35" cy="35" r="28"/>
+        <circle class="ds-ring-fill" cx="35" cy="35" r="28" stroke-dasharray="${circ}" stroke-dashoffset="${off}" style="stroke:${pct===100?'var(--gold)':'var(--green)'}"/></svg>
+        <div class="ds-pct">${pct}%</div>
+      </div>
+      <div class="ds-info">
+        <div class="ds-title">${pct===100?'🎉 Wszystko zrobione!':pct>=50?'💪 Swietnie ci idzie!':'🚀 Ruszaj na przygode!'}</div>
+        <div class="ds-sub">${done} zrobione${skipped?' · '+skipped+' pominiete':''} · ${todayXP} XP dzisiaj</div>
+      </div>
+    </div>
+  `;
+
+  // Combo
+  const comboActive=D.comboCount>=2&&Date.now()-D.lastTaskTime<COMBO_MS;
+  html+=`<div class="combo-bar ${comboActive?'active':''}">
+    <span class="combo-text">🔥 COMBO!</span>
+    <span class="combo-mult">x${Math.min(D.comboCount,5)}</span>
+  </div>`;
+
+  // Path track
+  html+=`<div class="path-track">`;
+
+  for(const cat of cats){
+    const tasks=D.routines.filter(r=>r.cat===cat.k);
+    if(!tasks.length)continue;
+    const catDone=tasks.filter(t=>comp.includes(t.id)).length;
+    const catSkip=tasks.filter(t=>skips.includes(t.id)).length;
+
+    html+=`<div class="path-cat">
+      <span class="path-cat-label">${cat.l}
+        <span class="path-cat-count">${catDone}/${tasks.length}${catSkip?' · '+catSkip+' pom.':''}</span>
+      </span>
+    </div>`;
+
+    for(const task of tasks){
+      const isDone=comp.includes(task.id);
+      const isSkipped=skips.includes(task.id);
+      const cls=isDone?'done':isSkipped?'skipped':'';
+
+      html+=`
+        <div class="path-task ${cls}">
+          <div class="path-dot">${isDone?'✓':isSkipped?'–':''}</div>
+          <div class="path-card" onclick="toggleTask('${task.id}',event)">
+            <span class="path-task-icon">${task.icon}</span>
+            <div class="path-task-info">
+              <div class="path-task-name">${task.name}</div>
+              <div class="path-task-xp">${isDone?'✅ Zrobione':isSkipped?'Pominiete':'⭐ +'+task.pts+' XP'}</div>
+            </div>
+            <div class="path-actions">
+              <button class="btn-skip" onclick="event.stopPropagation();skipTask('${task.id}',event)">
+                ${isSkipped?'Cofnij':'Pomin'}
+              </button>
+              <div class="btn-complete">${isDone?'✓':'○'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Treasure chest
+  const allAddressed=addressed>=total&&total>0;
+  const chestDone=D.chestOpened[today];
+  const chestPct=total?Math.round(addressed/total*100):0;
+
+  html+=`</div>`;
+  html+=`<div class="chest-area" onclick="${allAddressed&&!chestDone?'openChest()':''}">
+    <div class="chest-icon ${chestDone?'opened':allAddressed?'unlocked':'locked'}">
+      ${chestDone?'✅':allAddressed?'🎁':'🔒'}
+    </div>
+    <div class="chest-label ${chestDone?'clr-green':allAddressed?'clr-gold':'clr-gray'}">
+      ${chestDone?'Skrzynia otwarta!':allAddressed?'Otworz skrzynie! 🎉':'Skoncz wszystkie zadania'}
+    </div>
+    ${!allAddressed?`<div class="chest-progress">
+      <div class="chest-pbar"><div class="chest-pbar-fill" style="width:${chestPct}%"></div></div>
+      ${addressed}/${total}
+    </div>`:''}
+  </div>`;
+
+  if(!total){
+    html=`<div style="text-align:center;padding:60px 20px;color:var(--text3)">
+      <div style="font-size:60px;margin-bottom:12px">🗺️</div>
+      <div style="font-weight:800;font-size:16px">Brak rutyn!</div>
+      <div style="font-weight:600;font-size:13px;margin-top:4px">Przejdz do Opcji i dodaj zadania</div>
+    </div>`;
+  }
+  $('viewPath').innerHTML=html;
+}
+
+function getXPToday(){
+  const c=D.completions[dk()]||[];let xp=0;
+  c.forEach(id=>{const r=D.routines.find(x=>x.id===id);if(r)xp+=r.pts});return xp;
+}
+
+function toggleTask(id,event){
+  const today=dk();
+  if(!D.completions[today])D.completions[today]=[];
+  if(!D.skips[today])D.skips[today]=[];
+
+  // If skipped, unskip first
+  const si=D.skips[today].indexOf(id);
+  if(si!==-1)D.skips[today].splice(si,1);
+
+  const idx=D.completions[today].indexOf(id);
+  const task=D.routines.find(r=>r.id===id);if(!task)return;
+  const prevLvl=getLevel(D.xp);
+
+  if(idx===-1){
+    D.completions[today].push(id);
+    const mult=registerCombo();
+    const boost=D.xpBoostUntil&&Date.now()<D.xpBoostUntil;
+    const earned=task.pts*mult*(boost?2:1);
+    D.xp+=earned;D.gems+=Math.floor(earned/10)+1;D.totalDone++;
+    playSound('done');
+    showPtPop(event,`+${earned} XP${mult>1?' x'+mult:''}${boost?' 🚀':''}`);
+    mascotExpr('excited',600);mascotSay(MSGS_E[Math.floor(Math.random()*MSGS_E.length)],2000);
+
+    if(getLevel(D.xp)>prevLvl)setTimeout(()=>showLevelUp(getLevel(D.xp)+1),500);
+
+    const comp=D.completions[today],skps=D.skips[today];
+    if(comp.length+skps.length>=D.routines.length&&D.routines.length>0&&!D.chestOpened[today]){
+      setTimeout(()=>mascotSay('Wszystko ogarniesz! Otworz skrzynie! 🎁',4000),800);
+    }
+  }else{
+    D.completions[today].splice(idx,1);
+    D.xp=Math.max(0,D.xp-task.pts);D.gems=Math.max(0,D.gems-Math.floor(task.pts/10)-1);
+    D.totalDone=Math.max(0,D.totalDone-1);playSound('click');
+  }
+  calcStreak();checkAchs();checkQuests();save();updateTop();renderPath();
+}
+
+function skipTask(id,event){
+  const today=dk();
+  if(!D.skips[today])D.skips[today]=[];
+  if(!D.completions[today])D.completions[today]=[];
+
+  // Remove from completed if was completed
+  const ci=D.completions[today].indexOf(id);
+  if(ci!==-1){
+    const task=D.routines.find(r=>r.id===id);
+    D.completions[today].splice(ci,1);
+    if(task){D.xp=Math.max(0,D.xp-task.pts);D.gems=Math.max(0,D.gems-Math.floor(task.pts/10)-1);D.totalDone=Math.max(0,D.totalDone-1)}
+  }
+
+  const si=D.skips[today].indexOf(id);
+  if(si===-1){
+    D.skips[today].push(id);
+    playSound('skip');
+    mascotSay(MSGS_S[Math.floor(Math.random()*MSGS_S.length)],2000);
+  }else{
+    // Unskip
+    D.skips[today].splice(si,1);
+    playSound('click');
+  }
+
+  // Check if all addressed now
+  const comp=D.completions[today],skps=D.skips[today];
+  if(comp.length+skps.length>=D.routines.length&&D.routines.length>0&&!D.chestOpened[today]){
+    setTimeout(()=>mascotSay('Skrzynia czeka! 🎁',3000),400);
+  }
+
+  calcStreak();save();updateTop();renderPath();
+}
+
+function showPtPop(event,text){
+  const p=document.createElement('div');p.className='pt-pop';p.textContent=text;
+  const r=event.currentTarget.getBoundingClientRect();
+  p.style.left=(r.left+r.width/2-30)+'px';p.style.top=(r.top-10)+'px';
+  document.body.appendChild(p);setTimeout(()=>p.remove(),1200);
+}
+
+// ---- Chest ----
+function openChest(){
+  const today=dk();if(D.chestOpened[today])return;
+  D.chestOpened[today]=true;
+  const comp=D.completions[today]||[];
+  const total=D.routines.length||1;
+  const ratio=comp.length/total; // reward scales with actual completion
+  const bonusXP=Math.floor((Math.random()*30+20)*ratio);
+  const bonusGems=Math.floor((Math.random()*10+5)*ratio);
+  D.xp+=bonusXP;D.gems+=bonusGems;
+  playSound('chest');launchConfetti();
+  $('ovChestContent').innerHTML=`
+    <div class="chest-open">🎁</div>
+    <div class="ov-title">Skrzynia otwarta!</div>
+    <div class="ov-text">${ratio>=1?'Perfekcyjny dzien! Pelna nagroda!':'Brawo! Nagroda za '+Math.round(ratio*100)+'% wykonania'}</div>
+    <div class="chest-rewards">
+      <div class="chest-rw"><div class="chest-rw-val" style="color:var(--gold)">+${bonusXP}</div><div class="chest-rw-label">XP</div></div>
+      <div class="chest-rw"><div class="chest-rw-val" style="color:var(--blue)">+${bonusGems}</div><div class="chest-rw-label">Gemy</div></div>
+    </div>
+    <button class="ov-btn gold" onclick="closeOv('ovChest')">Ekstra! 🎉</button>
+  `;
+  $('ovChest').classList.add('active');
+  save();updateTop();renderPath();
+}
+
+// ---- Level ----
+function showLevelUp(level){
+  const info=LEVELS[level-1]||LEVELS[LEVELS.length-1];
+  playSound('levelup');launchConfetti();
+  $('ovLevelContent').innerHTML=`
+    <div class="level-up-badge">${level}</div>
+    <div class="level-title">${info.name}</div>
+    <div class="ov-title">Nowy poziom!</div>
+    <div class="ov-text">Gratulacje! Jestes na poziomie ${level}!</div>
+    <button class="ov-btn gold" onclick="closeOv('ovLevel')">Super! 🚀</button>
+  `;$('ovLevel').classList.add('active');
+}
+function showLevelInfo(){
+  const li=getLevelInfo(D.xp);
+  let html=`<div class="level-up-badge" style="animation:none">${li.level}</div>
+    <div class="level-title">${li.name}</div>
+    <div class="ov-title">Poziom ${li.level}</div>
+    <div class="ov-text">XP: ${li.totalXp} lacznie<br>Do nastepnego: ${li.needed-li.xp} XP</div><div style="margin-bottom:16px">`;
+  LEVELS.forEach((l,i)=>{
+    const cur=li.level===i+1;
+    html+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;opacity:${li.level>i||cur?1:0.3}">
+      <span style="font-size:14px;font-weight:900;width:24px;text-align:center;color:${cur?'var(--gold)':'var(--text)'}">${i+1}</span>
+      <span style="font-size:13px;font-weight:700">${l.name}</span>
+      ${cur?'<span style="font-size:10px;color:var(--gold);font-weight:800">← TU</span>':''}
+    </div>`;
+  });
+  html+=`</div><button class="ov-btn" onclick="closeOv('ovGeneral')">OK</button>`;
+  $('ovGeneralContent').innerHTML=html;$('ovGeneral').classList.add('active');
+}
+function showStreakPopup(){
+  const days=[],t=new Date(),dn=['Nd','Pn','Wt','Sr','Cz','Pt','So'];
+  for(let i=6;i>=0;i--){const dt=new Date(t);dt.setDate(dt.getDate()-i);const k=dk(dt);const c=D.completions[k]||[];const f=c.length>=D.routines.length&&D.routines.length>0;days.push({l:dn[dt.getDay()],a:f,t:i===0})}
+  $('ovStreakContent').innerHTML=`<div class="streak-fire-big">🔥</div>
+    <div class="ov-title">${D.streak} ${D.streak===1?'dzien':'dni'} z rzedu!</div>
+    <div class="ov-text">Najdluzsza seria: ${D.longestStreak} dni</div>
+    <div class="streak-days">${days.map(d=>`<div class="streak-day ${d.a?'active':''} ${d.t?'today':''}">${d.a?'🔥':d.l}</div>`).join('')}</div>
+    ${D.streakFreezes>0?`<div style="font-size:12px;color:var(--blue);font-weight:700;margin-bottom:12px">❄️ Masz ${D.streakFreezes} zamrozen</div>`:''}
+    <button class="ov-btn" onclick="closeOv('ovStreak')">Tak trzymaj! 💪</button>`;
+  $('ovStreak').classList.add('active');
+}
+
+// ---- Quests ----
+function renderQuests(){
+  const quests=getDailyQuests(),today=dk(),doneQ=D.questsDone[today]||[];
+  let html=`<div class="section-title">⚔️ Misje dnia</div>`;
+  for(const q of quests){
+    const completed=doneQ.includes(q.id);
+    const pg=typeof q.pg==='function'?q.pg(D,today):0;
+    const mx=typeof q.mx==='function'?q.mx(D):q.mx;
+    const pct=Math.min(100,Math.round(pg/mx*100));
+    html+=`<div class="quest-card ${completed?'completed':''}">
+      <span class="quest-icon">${q.icon}</span>
+      <div class="quest-info"><div class="quest-name">${q.name}</div><div class="quest-desc">${q.desc}</div>
+        ${!completed?`<div class="quest-progress"><div class="quest-progress-fill" style="width:${pct}%"></div></div>`:''}
+      </div>
+      ${completed?'<span style="font-size:24px;color:var(--green)">✅</span>':`<div class="quest-reward"><span class="quest-reward-val">💎 ${q.rew}</span><span class="quest-reward-label">gemow</span></div>`}
+    </div>`;
+  }
+  // Auto-claim
+  for(const q of quests){
+    if(!doneQ.includes(q.id)&&q.ck(D,today)){
+      if(!D.questsDone[today])D.questsDone[today]=[];
+      D.questsDone[today].push(q.id);D.gems+=q.rew;save();updateTop();
+      showToast(`⚔️ ${q.name} +${q.rew} 💎`);playSound('done');
+    }
+  }
+  html+=`<div style="text-align:center;padding:20px;color:var(--text3);font-weight:600;font-size:12px">Misje odnawiaja sie codziennie!</div>`;
+  $('viewQuests').innerHTML=html;
+}
+function checkQuests(){
+  const quests=getDailyQuests(),today=dk(),doneQ=D.questsDone[today]||[];
+  for(const q of quests)if(!doneQ.includes(q.id)&&q.ck(D,today)){
+    if(!D.questsDone[today])D.questsDone[today]=[];
+    D.questsDone[today].push(q.id);D.gems+=q.rew;save();updateTop();
+    setTimeout(()=>showToast(`⚔️ ${q.name} +${q.rew} 💎`),300);
+  }
+}
+
+// ---- Shop ----
+function renderShop(){
+  let html=`<div class="shop-balance"><div class="shop-balance-val">💎 ${D.gems}</div><div class="shop-balance-label">Twoje gemy</div></div>
+    <div class="shop-sub">⚡ Power-upy</div><div class="shop-grid">`;
+  const pus=[{id:'freeze',name:'Zamrozenie serii',icon:'❄️',cost:30,desc:'Ochron serie na 1 dzien'},{id:'boost',name:'Podwojne XP',icon:'🚀',cost:50,desc:'2x XP przez 24h'}];
+  for(const p of pus){
+    const can=D.gems>=p.cost;
+    html+=`<div class="shop-item ${can?'':'cant'}" onclick="${can?"buyPU('"+p.id+"')":""}">
+      <div class="shop-item-icon">${p.icon}</div><div class="shop-item-name">${p.name}</div>
+      <div class="shop-item-cost">💎 ${p.cost}</div><div class="shop-item-desc">${p.desc}</div></div>`;
+  }
+  html+=`</div><div class="shop-sub">🎁 Nagrody</div>`;
+  for(const r of D.rewards){
+    const can=D.gems>=r.cost;
+    html+=`<div class="real-reward"><span class="rr-icon">${r.icon}</span>
+      <div class="rr-info"><div class="rr-name">${r.name}</div><div class="rr-cost">💎 ${r.cost}</div></div>
+      <button class="rr-btn ${can?'can':'nope'}" ${can?`onclick="redeemRw('${r.id}')"`:'disabled'}>${can?'Odbierz!':'Za malo'}</button></div>`;
+  }
+  if(!D.rewards.length)html+=`<div style="text-align:center;padding:20px;color:var(--text3)"><div style="font-size:40px">🎁</div><div style="font-weight:700;font-size:13px">Dodaj nagrody w Opcjach!</div></div>`;
+  if(D.rewardHistory.length){
+    html+=`<div class="shop-sub">📜 Historia</div>`;
+    for(const h of[...D.rewardHistory].reverse().slice(0,10))
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg2);border-radius:10px;margin-bottom:4px;font-size:13px"><span>${h.icon}</span><span style="font-weight:700;flex:1">${h.name}</span><span style="color:var(--text3);font-size:11px">${h.date}</span></div>`;
+  }
+  $('viewShop').innerHTML=html;
+}
+function buyPU(id){
+  if(id==='freeze'&&D.gems>=30){D.gems-=30;D.streakFreezes++;showToast('❄️ Zamrozenie kupione!')}
+  else if(id==='boost'&&D.gems>=50){D.gems-=50;D.xpBoostUntil=Date.now()+86400000;showToast('🚀 2x XP na 24h!')}
+  else return;
+  playSound('chest');save();updateTop();renderShop();
+}
+function redeemRw(id){
+  const r=D.rewards.find(x=>x.id===id);if(!r||D.gems<r.cost)return;
+  D.gems-=r.cost;D.rewardHistory.push({id:r.id,name:r.name,icon:r.icon,cost:r.cost,date:new Date().toLocaleDateString('pl-PL')});
+  playSound('chest');launchConfetti();checkAchs();save();updateTop();renderShop();
+  mascotExpr('excited',1500);mascotSay('Nagroda odebrana! 🎉',3000);
+}
+
+// ---- Stats ----
+function renderStats(){
+  const li=getLevelInfo(D.xp);
+  let html=`<div class="stat-card"><div class="stat-header">📊 Statystyki</div>
+    <div class="stat-grid">
+      <div class="sg-item"><div class="sg-val o">${li.level}</div><div class="sg-label">Poziom</div></div>
+      <div class="sg-item"><div class="sg-val g">${D.xp}</div><div class="sg-label">XP lacznie</div></div>
+      <div class="sg-item"><div class="sg-val" style="color:var(--orange)">${D.streak}</div><div class="sg-label">Seria</div></div>
+      <div class="sg-item"><div class="sg-val" style="color:var(--red)">${D.longestStreak}</div><div class="sg-label">Najdl. seria</div></div>
+      <div class="sg-item"><div class="sg-val b">${D.gems}</div><div class="sg-label">Gemy</div></div>
+      <div class="sg-item"><div class="sg-val p">${D.totalDone}</div><div class="sg-label">Zadan</div></div>
+    </div></div>`;
+  // Calendar
+  html+=`<div class="stat-card"><div class="stat-header">📅 Kalendarz</div>
+    <div class="cal-month-nav"><button class="cal-nav-btn" onclick="calPrev()">◀</button><div class="cal-month-title">${MPL[calMonth]} ${calYear}</div><button class="cal-nav-btn" onclick="calNext()">▶</button></div>
+    <div class="cal-grid">`;
+  for(const d of DPL)html+=`<div class="cal-dn">${d}</div>`;
+  const first=new Date(calYear,calMonth,1),last=new Date(calYear,calMonth+1,0),t=new Date();
+  const startDow=(first.getDay()+6)%7;
+  for(let i=0;i<startDow;i++)html+=`<div class="cal-d empty"></div>`;
+  let perf=0,act=0;
+  for(let d=1;d<=last.getDate();d++){
+    const dt=new Date(calYear,calMonth,d),k=dk(dt);
+    const c=D.completions[k]||[],rn=D.routines.length||1;
+    const pct=Math.round(c.length/rn*100);
+    const lv=pct===0?0:pct<33?1:pct<66?2:pct<100?3:4;
+    if(c.length>0)act++;if(pct>=100)perf++;
+    html+=`<div class="cal-d l${lv} ${dt.toDateString()===t.toDateString()?'today':''}">${d}</div>`;
+  }
+  html+=`</div><div class="stat-grid" style="margin-top:8px">
+    <div class="sg-item"><div class="sg-val g">${perf}</div><div class="sg-label">Perfekcyjne</div></div>
+    <div class="sg-item"><div class="sg-val b">${act}</div><div class="sg-label">Aktywne dni</div></div>
+  </div></div>`;
+  // Achievements
+  html+=`<div class="stat-card"><div class="stat-header">🏆 Osiagniecia (${D.achievements.length}/${ACHS.length})</div><div class="ach-grid">`;
+  for(const a of ACHS){const u=D.achievements.includes(a.id),pg=a.pg(D),pct=Math.min(100,Math.round(pg/a.mx*100));
+    html+=`<div class="ach-card ${u?'unlocked':'locked'}"><div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div>
+    ${u?'<div class="ach-date">✅</div>':`<div class="ach-prog"><div class="ach-prog-fill" style="width:${pct}%"></div></div><div class="ach-desc" style="margin-top:2px">${pg}/${a.mx}</div>`}</div>`}
+  html+=`</div></div>`;
+  $('viewStats').innerHTML=html;
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--}renderStats()}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++}renderStats()}
+function checkAchs(){for(const a of ACHS)if(!D.achievements.includes(a.id)&&a.ck(D)){D.achievements.push(a.id);save();setTimeout(()=>{playSound('levelup');launchConfetti();$('ovAchContent').innerHTML=`<div class="ov-emoji">${a.icon}</div><div class="ov-title">Nowe osiagniecie!</div><div class="ov-text">${a.name}<br>${a.desc}</div><button class="ov-btn gold" onclick="closeOv('ovAch')">Mega! 🏆</button>`;$('ovAch').classList.add('active')},700)}}
+
+// ---- Settings ----
+const EMOJIS=['🪥','🛏️','👕','🥣','🎒','📚','📖','🧹','⚽','🚿','👔','📕','🎮','🎨','🎵','🏊','🚴','🧩','✏️','🍎','💧','🐕','🌱','🧘','🎯','📱','🍕','🎬','🍦','🏞️','🌙','🎁','🎪','🚗','✈️','🎂','🌈','⭐','💎','🎭','🧸','🪁'];
+function renderSettings(){
+  const cats=[{k:'morning',l:'🌅 Poranek'},{k:'afternoon',l:'☀️ Popoludnie'},{k:'evening',l:'🌙 Wieczor'}];
+  let html=`<div class="sett-section"><div class="sett-title">📋 Rutyny</div>`;
+  for(const c of cats){const ts=D.routines.filter(r=>r.cat===c.k);html+=`<div class="sett-cat-title">${c.l}</div>`;
+    for(const t of ts)html+=`<div class="sett-item"><span class="sett-item-icon">${t.icon}</span><span class="sett-item-name">${t.name}</span><span class="sett-item-pts">+${t.pts} XP</span><button class="del-btn" onclick="delR('${t.id}')">✕</button></div>`}
+  html+=`<button class="add-btn" onclick="showAddR()">+ Dodaj rutyne</button></div>`;
+  html+=`<div class="sett-section"><div class="sett-title">🎁 Nagrody</div>`;
+  for(const r of D.rewards)html+=`<div class="sett-item"><span class="sett-item-icon">${r.icon}</span><span class="sett-item-name">${r.name}</span><span class="sett-item-pts">💎 ${r.cost}</span><button class="del-btn" onclick="delW('${r.id}')">✕</button></div>`;
+  html+=`<button class="add-btn" onclick="showAddW()">+ Dodaj nagrode</button></div>`;
+  html+=`<div class="sett-section"><div class="sett-title">🔊 Dzwiek</div><div class="sound-toggle"><span style="font-weight:700">Efekty dzwiekowe</span><button class="toggle-sw ${D.soundOn!==false?'on':''}" onclick="tglSnd(this)"></button></div></div>`;
+  html+=`<div class="sett-section"><div class="sett-title">🔧 Dane</div><div class="stat-grid"><div class="sg-item"><div class="sg-val o">${D.xp}</div><div class="sg-label">XP</div></div><div class="sg-item"><div class="sg-val b">${D.gems}</div><div class="sg-label">Gemy</div></div></div><button class="reset-btn" onclick="confirmReset()">🗑️ Resetuj dane</button></div>`;
+  $('viewSettings').innerHTML=html;
+}
+function tglSnd(el){D.soundOn=!el.classList.contains('on');el.classList.toggle('on');soundOn=D.soundOn;save()}
+function showAddR(){
+  let eg='';EMOJIS.forEach(e=>eg+=`<span class="emoji-opt" onclick="selE(this,'${e}')">${e}</span>`);
+  showModal(`<div class="modal-title">Nowa rutyna</div>
+    <div class="modal-field"><label>Nazwa</label><input type="text" id="nN" placeholder="np. Umyc zeby"></div>
+    <div class="modal-field"><label>Ikona</label><div class="emoji-grid">${eg}</div><input type="hidden" id="nI" value="⭐"></div>
+    <div class="modal-field"><label>Kategoria</label><select id="nC"><option value="morning">🌅 Poranek</option><option value="afternoon">☀️ Popoludnie</option><option value="evening">🌙 Wieczor</option></select></div>
+    <div class="modal-field"><label>XP</label><input type="number" id="nP" value="5" min="1" max="50"></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Anuluj</button><button class="mbtn-save" onclick="saveR()">Dodaj ✓</button></div>`);
+}
+function selE(el,e){document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');$('nI').value=e}
+function saveR(){const n=$('nN').value.trim();if(!n){showToast('Wpisz nazwe!');return}D.routines.push({id:'r'+Date.now(),name:n,icon:$('nI').value,cat:$('nC').value,pts:Math.max(1,Math.min(50,parseInt($('nP').value)||5))});save();closeModal();renderSettings();showToast('Dodane! ✅')}
+function delR(id){D.routines=D.routines.filter(r=>r.id!==id);for(const k in D.completions)D.completions[k]=D.completions[k].filter(x=>x!==id);for(const k in D.skips)D.skips[k]=D.skips[k].filter(x=>x!==id);save();renderSettings();showToast('Usunieto')}
+function showAddW(){
+  const re=['🎮','📱','🍕','🎬','🍦','🏞️','🌙','🎁','🎪','🚗','✈️','🎂','🌈','💎','🎭','🍰','🧸','🪁'];
+  let eg='';re.forEach(e=>eg+=`<span class="emoji-opt" onclick="selE2(this,'${e}')">${e}</span>`);
+  showModal(`<div class="modal-title">Nowa nagroda</div>
+    <div class="modal-field"><label>Nazwa</label><input type="text" id="wN" placeholder="np. Wieczor filmowy"></div>
+    <div class="modal-field"><label>Ikona</label><div class="emoji-grid">${eg}</div><input type="hidden" id="wI" value="🎁"></div>
+    <div class="modal-field"><label>Koszt (gemy)</label><input type="number" id="wC" value="50" min="5" max="999"></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Anuluj</button><button class="mbtn-save" onclick="saveW()">Dodaj ✓</button></div>`);
+}
+function selE2(el,e){document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');$('wI').value=e}
+function saveW(){const n=$('wN').value.trim();if(!n){showToast('Wpisz nazwe!');return}D.rewards.push({id:'w'+Date.now(),name:n,icon:$('wI').value,cost:Math.max(5,Math.min(999,parseInt($('wC').value)||50))});save();closeModal();renderSettings();showToast('Dodane! 🎁')}
+function delW(id){D.rewards=D.rewards.filter(r=>r.id!==id);save();renderSettings();showToast('Usunieto')}
+function confirmReset(){showModal(`<div class="modal-title">⚠️ Resetowac?</div><p style="text-align:center;color:var(--text3);margin-bottom:16px;font-weight:600">Wszystkie postepy beda usuniete!</p><div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Nie!</button><button class="mbtn-save" style="background:var(--red)" onclick="doReset()">Tak, resetuj</button></div>`)}
+function doReset(){localStorage.removeItem(SK);D=defaults();save();closeModal();updateTop();renderPath();showToast('Zresetowane')}
+
+// ---- Helpers ----
+function showModal(h){$('modalBox').innerHTML=h;$('modalBg').classList.add('active')}
+function closeModal(){$('modalBg').classList.remove('active')}
+$('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal()});
+function closeOv(id){$(id).classList.remove('active')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}));
+function launchConfetti(){const c=$('confBox'),cols=['#58CC02','#FFC800','#1CB0F6','#CE82FF','#FF4B4B','#FF9600','#fff'];for(let i=0;i<50;i++){const p=document.createElement('div');p.className='confetti-p';p.style.left=Math.random()*100+'%';p.style.backgroundColor=cols[Math.floor(Math.random()*cols.length)];p.style.animationDuration=(Math.random()*2+1.5)+'s';p.style.animationDelay=Math.random()*0.3+'s';p.style.width=(Math.random()*8+5)+'px';p.style.height=(Math.random()*8+5)+'px';c.appendChild(p)}setTimeout(()=>c.innerHTML='',4000)}
+function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+// ---- INIT ----
+(function(){
+  const today=dk();
+  if(D._lastDay!==today){D._dayMaxCombo=0;D._lastDay=today;save()}
+  calcStreak();updateTop();renderPath();
+  setTimeout(()=>mascotSay(MSGS_G[Math.floor(Math.random()*MSGS_G.length)],4000),500);
+})();
+</script>
+</body>
+</html>
