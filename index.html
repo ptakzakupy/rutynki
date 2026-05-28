@@ -529,14 +529,29 @@ async function loadFromCloud(){
     }
     if(data&&data.data){
       const remote=data.data;
-      const localTs=D._ts||0,remoteTs=remote._ts||0;
-      if(remoteTs>localTs){
+      const remoteTs=remote._ts||0;
+      const localTs=D._ts||0;
+      // Sprawdz czy lokalne dane maja prawdziwa zawartosc (nie domyslne)
+      const localReal=D.totalDone>0||D.xp>0||Object.keys(D.completions||{}).length>0||(D._userEdited);
+      const remoteReal=(remote.totalDone||0)>0||(remote.xp||0)>0||Object.keys(remote.completions||{}).length>0||(remote._userEdited);
+
+      if(remoteTs>0&&(localTs===0||remoteTs>localTs)){
+        // Chmura ma nowsze dane — uzyj ich
         D={...defaults(),...remote};
         localStorage.setItem(SK,JSON.stringify(D));
-        updateTop();renderPath();
         showToast('☁️ Dane z chmury zaladowane!');
-      }else if(localTs>remoteTs){
-        // Lokalny stan nowszy — wyślij do chmury
+      }else if(remoteReal&&!localReal&&localTs===0){
+        // Nowe urzadzenie — chmura ma dane, lokalne sa domyslne
+        D={...defaults(),...remote};
+        localStorage.setItem(SK,JSON.stringify(D));
+        showToast('☁️ Dane z chmury zaladowane!');
+      }else if(localTs>remoteTs||(localReal&&!remoteReal)){
+        // Lokalne nowsze lub maja dane a chmura pusta — wyslij
+        D._ts=Date.now();
+        await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
+      }else if(remoteTs===0&&localTs===0){
+        // Oba swieże — wyslij lokalne (pierwszy sync)
+        D._ts=Date.now();
         await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
       }
     }
@@ -686,9 +701,10 @@ function load(){
 }
 function save(){
   D._ts=Date.now();
+  D._userEdited=true;
   localStorage.setItem(SK,JSON.stringify(D));
   // Debounced cloud save (1s)
-  if(syncOK){clearTimeout(saveTmr);saveTmr=setTimeout(saveToCloud,1000)}
+  if(syncOK&&cloudReady){clearTimeout(saveTmr);saveTmr=setTimeout(saveToCloud,1000)}
 }
 
 // ---- Nav ----
@@ -1258,15 +1274,19 @@ function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show')
 
 // ---- INIT ----
 (async function(){
-  const today=dk();
-  if(D._lastDay!==today){D._dayMaxCombo=0;D._lastDay=today;save()}
+  // 1. Pokaż UI natychmiast z localStorage
   calcStreak();updateTop();renderPath();
-  // Cloud sync
+  // 2. Cloud sync PRZED jakimkolwiek save()
   initSync();
   if(syncOK){
     await loadFromCloud();
-    updateTop();renderPath();
+    updateTop();
+    const active=document.querySelector('.view.active');
+    if(active)render(active.id);
   }
+  // 3. Dopiero teraz daily reset
+  const today=dk();
+  if(D._lastDay!==today){D._dayMaxCombo=0;D._lastDay=today;save()}
   const mg=msgsG();setTimeout(()=>mascotSay(mg[Math.floor(Math.random()*mg.length)],4000),500);
 })();
 </script>
