@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Rutynki ⭐</title>
+<title>Rutynki ⭐ Gustaw</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -332,6 +332,10 @@ body{
 .sett-item-pts{font-size:12px;color:var(--gold);font-weight:800}
 .del-btn{background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px 8px;border-radius:8px}
 .del-btn:hover{background:rgba(255,75,75,0.1)}
+.edit-btn{background:none;border:none;color:var(--blue);font-size:14px;cursor:pointer;padding:4px 8px;border-radius:8px}
+.edit-btn:hover{background:rgba(28,176,246,0.1)}
+.sett-item{cursor:pointer;transition:background 0.15s}
+.sett-item:hover{background:var(--bg3)}
 .add-btn{width:100%;padding:12px;margin-top:8px;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
 .add-btn:hover{filter:brightness(1.1)}
 .reset-btn{width:100%;padding:12px;margin-top:8px;background:rgba(255,75,75,0.1);color:var(--red);border:2px solid var(--red);border-radius:var(--radius-sm);font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
@@ -586,17 +590,18 @@ function playSound(type){
   }catch(e){}
 }
 
-// ---- Mascot ----
-const MSGS_E=['Super robota! 💪','Nie zatrzymuj sie!','Jestes na fali! 🌊','Tak trzymaj! ⚡','Mega! 🚀','Brawo! 👏','Bomba! 💣'];
-const MSGS_G=['Hej! Gotowy na przygode? 🗺️','Czesc! Dzis bedzie super!','Nowy dzien, nowe wyzwania!','Siema! Ruszamy! 🚀'];
-const MSGS_I=['Hej, pamietasz o zadaniach? 😊','Klik klik! Czekam!','Mozesz to zrobic! 💪'];
+// ---- Mascot (personalized) ----
+function cn(){return D.childName||'Bohaterze'}
+function msgsE(){return[`Super robota, ${cn()}! 💪`,`${cn()}, nie zatrzymuj sie!`,`${cn()}, jestes na fali! 🌊`,'Tak trzymaj! ⚡',`Mega, ${cn()}! 🚀`,'Brawo! 👏','Bomba! 💣',`${cn()} daje rade! 🔥`]}
+function msgsG(){return[`Hej ${cn()}! Gotowy na przygode? 🗺️`,`Czesc ${cn()}! Dzis bedzie super!`,`${cn()}, nowy dzien, nowe wyzwania!`,`Siema ${cn()}! Ruszamy! 🚀`]}
+function msgsI(){return[`Hej ${cn()}, pamietasz o zadaniach? 😊`,'Klik klik! Czekam!',`${cn()}, mozesz to zrobic! 💪`]}
 const MSGS_C=['COMBO! 🔥🔥🔥','Seria!!! Nie przerywaj!','Niesamowite tempo! ⚡'];
-const MSGS_S=['Nic sie nie stalo!','Wrocisz do tego jutro 😊','OK, lecimy dalej!','Nie kazdy dzien jest taki sam 💙'];
+function msgsS(){return['Nic sie nie stalo!',`${cn()}, wrocisz do tego jutro 😊`,'OK, lecimy dalej!','Nie kazdy dzien jest taki sam 💙']}
 
 let speechTO=null;
 function mascotSay(msg,dur){const b=$('speechBubble');b.textContent=msg;b.classList.add('show');clearTimeout(speechTO);speechTO=setTimeout(()=>b.classList.remove('show'),dur||3000)}
 function mascotExpr(expr,dur){const m=$('mascot');m.className='mascot '+expr;if(dur)setTimeout(()=>m.className='mascot',dur)}
-function mascotTap(){mascotExpr('excited',800);mascotSay([...MSGS_E,...MSGS_I][Math.floor(Math.random()*(MSGS_E.length+MSGS_I.length))],2500);playSound('click')}
+function mascotTap(){const all=[...msgsE(),...msgsI()];mascotExpr('excited',800);mascotSay(all[Math.floor(Math.random()*all.length)],2500);playSound('click')}
 function $(id){return document.getElementById(id)}
 
 // ---- Default data ----
@@ -632,6 +637,7 @@ function defaults(){return{
   comboCount:0,lastTaskTime:0,_maxCombo:0,_dayMaxCombo:0,_lastDay:'',
   chestOpened:{},questsDone:{},
   streakFreezes:0,xpBoostUntil:0,soundOn:true,
+  childName:'Gustaw',
 }}
 
 // ---- Achievements ----
@@ -808,7 +814,7 @@ function renderPath(){
         <div class="ds-pct">${pct}%</div>
       </div>
       <div class="ds-info">
-        <div class="ds-title">${pct===100?'🎉 Wszystko zrobione!':pct>=50?'💪 Swietnie ci idzie!':'🚀 Ruszaj na przygode!'}</div>
+        <div class="ds-title">${pct===100?'🎉 '+cn()+', wszystko zrobione!':pct>=50?'💪 Swietnie ci idzie, '+cn()+'!':'🚀 '+cn()+', ruszaj na przygode!'}</div>
         <div class="ds-sub">${done} zrobione${skipped?' · '+skipped+' pominiete':''} · ${todayXP} XP dzisiaj</div>
       </div>
     </div>
@@ -917,7 +923,7 @@ function toggleTask(id,event){
     D.xp+=earned;D.gems+=Math.floor(earned/10)+1;D.totalDone++;
     playSound('done');
     showPtPop(event,`+${earned} XP${mult>1?' x'+mult:''}${boost?' 🚀':''}`);
-    mascotExpr('excited',600);mascotSay(MSGS_E[Math.floor(Math.random()*MSGS_E.length)],2000);
+    const me=msgsE();mascotExpr('excited',600);mascotSay(me[Math.floor(Math.random()*me.length)],2000);
 
     if(getLevel(D.xp)>prevLvl)setTimeout(()=>showLevelUp(getLevel(D.xp)+1),500);
 
@@ -950,7 +956,7 @@ function skipTask(id,event){
   if(si===-1){
     D.skips[today].push(id);
     playSound('skip');
-    mascotSay(MSGS_S[Math.floor(Math.random()*MSGS_S.length)],2000);
+    const ms=msgsS();mascotSay(ms[Math.floor(Math.random()*ms.length)],2000);
   }else{
     // Unskip
     D.skips[today].splice(si,1);
@@ -987,7 +993,7 @@ function openChest(){
   $('ovChestContent').innerHTML=`
     <div class="chest-open">🎁</div>
     <div class="ov-title">Skrzynia otwarta!</div>
-    <div class="ov-text">${ratio>=1?'Perfekcyjny dzien! Pelna nagroda!':'Brawo! Nagroda za '+Math.round(ratio*100)+'% wykonania'}</div>
+    <div class="ov-text">${ratio>=1?'Perfekcyjny dzien, '+cn()+'! Pelna nagroda!':'Brawo '+cn()+'! Nagroda za '+Math.round(ratio*100)+'% wykonania'}</div>
     <div class="chest-rewards">
       <div class="chest-rw"><div class="chest-rw-val" style="color:var(--gold)">+${bonusXP}</div><div class="chest-rw-label">XP</div></div>
       <div class="chest-rw"><div class="chest-rw-val" style="color:var(--blue)">+${bonusGems}</div><div class="chest-rw-label">Gemy</div></div>
@@ -1006,7 +1012,7 @@ function showLevelUp(level){
     <div class="level-up-badge">${level}</div>
     <div class="level-title">${info.name}</div>
     <div class="ov-title">Nowy poziom!</div>
-    <div class="ov-text">Gratulacje! Jestes na poziomie ${level}!</div>
+    <div class="ov-text">Gratulacje, ${cn()}! Jestes na poziomie ${level}!</div>
     <button class="ov-btn gold" onclick="closeOv('ovLevel')">Super! 🚀</button>
   `;$('ovLevel').classList.add('active');
 }
@@ -1031,7 +1037,7 @@ function showStreakPopup(){
   const days=[],t=new Date(),dn=['Nd','Pn','Wt','Sr','Cz','Pt','So'];
   for(let i=6;i>=0;i--){const dt=new Date(t);dt.setDate(dt.getDate()-i);const k=dk(dt);const c=D.completions[k]||[];const f=c.length>=D.routines.length&&D.routines.length>0;days.push({l:dn[dt.getDay()],a:f,t:i===0})}
   $('ovStreakContent').innerHTML=`<div class="streak-fire-big">🔥</div>
-    <div class="ov-title">${D.streak} ${D.streak===1?'dzien':'dni'} z rzedu!</div>
+    <div class="ov-title">${cn()}: ${D.streak} ${D.streak===1?'dzien':'dni'} z rzedu!</div>
     <div class="ov-text">Najdluzsza seria: ${D.longestStreak} dni</div>
     <div class="streak-days">${days.map(d=>`<div class="streak-day ${d.a?'active':''} ${d.t?'today':''}">${d.a?'🔥':d.l}</div>`).join('')}</div>
     ${D.streakFreezes>0?`<div style="font-size:12px;color:var(--blue);font-weight:700;margin-bottom:12px">❄️ Masz ${D.streakFreezes} zamrozen</div>`:''}
@@ -1112,7 +1118,7 @@ function redeemRw(id){
   const r=D.rewards.find(x=>x.id===id);if(!r||D.gems<r.cost)return;
   D.gems-=r.cost;D.rewardHistory.push({id:r.id,name:r.name,icon:r.icon,cost:r.cost,date:new Date().toLocaleDateString('pl-PL')});
   playSound('chest');launchConfetti();checkAchs();save();updateTop();renderShop();
-  mascotExpr('excited',1500);mascotSay('Nagroda odebrana! 🎉',3000);
+  mascotExpr('excited',1500);mascotSay(`${cn()} odbiera nagrode! 🎉`,3000);
 }
 
 // ---- Stats ----
@@ -1158,18 +1164,24 @@ function renderStats(){
 }
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--}renderStats()}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++}renderStats()}
-function checkAchs(){for(const a of ACHS)if(!D.achievements.includes(a.id)&&a.ck(D)){D.achievements.push(a.id);save();setTimeout(()=>{playSound('levelup');launchConfetti();$('ovAchContent').innerHTML=`<div class="ov-emoji">${a.icon}</div><div class="ov-title">Nowe osiagniecie!</div><div class="ov-text">${a.name}<br>${a.desc}</div><button class="ov-btn gold" onclick="closeOv('ovAch')">Mega! 🏆</button>`;$('ovAch').classList.add('active')},700)}}
+function checkAchs(){for(const a of ACHS)if(!D.achievements.includes(a.id)&&a.ck(D)){D.achievements.push(a.id);save();setTimeout(()=>{playSound('levelup');launchConfetti();$('ovAchContent').innerHTML=`<div class="ov-emoji">${a.icon}</div><div class="ov-title">${cn()} zdobywa osiagniecie!</div><div class="ov-text">${a.name}<br>${a.desc}</div><button class="ov-btn gold" onclick="closeOv('ovAch')">Mega! 🏆</button>`;$('ovAch').classList.add('active')},700)}}
 
 // ---- Settings ----
 const EMOJIS=['🪥','🛏️','👕','🥣','🎒','📚','📖','🧹','⚽','🚿','👔','📕','🎮','🎨','🎵','🏊','🚴','🧩','✏️','🍎','💧','🐕','🌱','🧘','🎯','📱','🍕','🎬','🍦','🏞️','🌙','🎁','🎪','🚗','✈️','🎂','🌈','⭐','💎','🎭','🧸','🪁'];
 function renderSettings(){
   const cats=[{k:'morning',l:'🌅 Poranek'},{k:'afternoon',l:'☀️ Popoludnie'},{k:'evening',l:'🌙 Wieczor'}];
-  let html=`<div class="sett-section"><div class="sett-title">📋 Rutyny</div>`;
+  let html=`<div class="sett-section"><div class="sett-title">👤 Dziecko</div>
+    <div class="sett-item" style="cursor:default"><span class="sett-item-icon">🧒</span><span class="sett-item-name">Imie</span>
+    <input type="text" id="childNameInput" value="${D.childName||'Gustaw'}"
+      style="width:120px;padding:6px 10px;background:var(--bg3);border:2px solid var(--bg3);color:var(--text);border-radius:8px;font-family:inherit;font-weight:700;font-size:14px;text-align:center;outline:none"
+      onchange="D.childName=this.value.trim()||'Gustaw';save();document.title='Rutynki ⭐ '+D.childName;showToast('Imie zmienione! 👋')" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--bg3)'">
+    </div></div>`;
+  html+=`<div class="sett-section"><div class="sett-title">📋 Rutyny</div>`;
   for(const c of cats){const ts=D.routines.filter(r=>r.cat===c.k);html+=`<div class="sett-cat-title">${c.l}</div>`;
-    for(const t of ts)html+=`<div class="sett-item"><span class="sett-item-icon">${t.icon}</span><span class="sett-item-name">${t.name}</span><span class="sett-item-pts">+${t.pts} XP</span><button class="del-btn" onclick="delR('${t.id}')">✕</button></div>`}
+    for(const t of ts)html+=`<div class="sett-item" onclick="showEditR('${t.id}')"><span class="sett-item-icon">${t.icon}</span><span class="sett-item-name">${t.name}</span><span class="sett-item-pts">+${t.pts} XP</span><button class="edit-btn" onclick="event.stopPropagation();showEditR('${t.id}')">✏️</button><button class="del-btn" onclick="event.stopPropagation();delR('${t.id}')">✕</button></div>`}
   html+=`<button class="add-btn" onclick="showAddR()">+ Dodaj rutyne</button></div>`;
   html+=`<div class="sett-section"><div class="sett-title">🎁 Nagrody</div>`;
-  for(const r of D.rewards)html+=`<div class="sett-item"><span class="sett-item-icon">${r.icon}</span><span class="sett-item-name">${r.name}</span><span class="sett-item-pts">💎 ${r.cost}</span><button class="del-btn" onclick="delW('${r.id}')">✕</button></div>`;
+  for(const r of D.rewards)html+=`<div class="sett-item" onclick="showEditW('${r.id}')"><span class="sett-item-icon">${r.icon}</span><span class="sett-item-name">${r.name}</span><span class="sett-item-pts">💎 ${r.cost}</span><button class="edit-btn" onclick="event.stopPropagation();showEditW('${r.id}')">✏️</button><button class="del-btn" onclick="event.stopPropagation();delW('${r.id}')">✕</button></div>`;
   html+=`<button class="add-btn" onclick="showAddW()">+ Dodaj nagrode</button></div>`;
   html+=`<div class="sett-section"><div class="sett-title">🔊 Dzwiek</div><div class="sound-toggle"><span style="font-weight:700">Efekty dzwiekowe</span><button class="toggle-sw ${D.soundOn!==false?'on':''}" onclick="tglSnd(this)"></button></div></div>`;
   html+=`<div class="sett-section"><div class="sett-title">🔧 Dane</div><div class="stat-grid"><div class="sg-item"><div class="sg-val o">${D.xp}</div><div class="sg-label">XP</div></div><div class="sg-item"><div class="sg-val b">${D.gems}</div><div class="sg-label">Gemy</div></div></div><button class="reset-btn" onclick="confirmReset()">🗑️ Resetuj dane</button></div>`;
@@ -1187,6 +1199,22 @@ function showAddR(){
 }
 function selE(el,e){document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');$('nI').value=e}
 function saveR(){const n=$('nN').value.trim();if(!n){showToast('Wpisz nazwe!');return}D.routines.push({id:'r'+Date.now(),name:n,icon:$('nI').value,cat:$('nC').value,pts:Math.max(1,Math.min(50,parseInt($('nP').value)||5))});save();closeModal();renderSettings();showToast('Dodane! ✅')}
+function showEditR(id){
+  const t=D.routines.find(r=>r.id===id);if(!t)return;
+  let eg='';EMOJIS.forEach(e=>eg+=`<span class="emoji-opt ${e===t.icon?'sel':''}" onclick="selE(this,'${e}')">${e}</span>`);
+  showModal(`<div class="modal-title">Edytuj rutyne</div>
+    <div class="modal-field"><label>Nazwa</label><input type="text" id="nN" value="${t.name}"></div>
+    <div class="modal-field"><label>Ikona</label><div class="emoji-grid">${eg}</div><input type="hidden" id="nI" value="${t.icon}"></div>
+    <div class="modal-field"><label>Kategoria</label><select id="nC"><option value="morning" ${t.cat==='morning'?'selected':''}>🌅 Poranek</option><option value="afternoon" ${t.cat==='afternoon'?'selected':''}>☀️ Popoludnie</option><option value="evening" ${t.cat==='evening'?'selected':''}>🌙 Wieczor</option></select></div>
+    <div class="modal-field"><label>XP</label><input type="number" id="nP" value="${t.pts}" min="1" max="50"></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Anuluj</button><button class="mbtn-save" onclick="updateR('${id}')">Zapisz ✓</button></div>`);
+}
+function updateR(id){
+  const t=D.routines.find(r=>r.id===id);if(!t)return;
+  const n=$('nN').value.trim();if(!n){showToast('Wpisz nazwe!');return}
+  t.name=n;t.icon=$('nI').value;t.cat=$('nC').value;t.pts=Math.max(1,Math.min(50,parseInt($('nP').value)||5));
+  save();closeModal();renderSettings();showToast('Zapisane! ✅');
+}
 function delR(id){D.routines=D.routines.filter(r=>r.id!==id);for(const k in D.completions)D.completions[k]=D.completions[k].filter(x=>x!==id);for(const k in D.skips)D.skips[k]=D.skips[k].filter(x=>x!==id);save();renderSettings();showToast('Usunieto')}
 function showAddW(){
   const re=['🎮','📱','🍕','🎬','🍦','🏞️','🌙','🎁','🎪','🚗','✈️','🎂','🌈','💎','🎭','🍰','🧸','🪁'];
@@ -1199,6 +1227,22 @@ function showAddW(){
 }
 function selE2(el,e){document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');$('wI').value=e}
 function saveW(){const n=$('wN').value.trim();if(!n){showToast('Wpisz nazwe!');return}D.rewards.push({id:'w'+Date.now(),name:n,icon:$('wI').value,cost:Math.max(5,Math.min(999,parseInt($('wC').value)||50))});save();closeModal();renderSettings();showToast('Dodane! 🎁')}
+function showEditW(id){
+  const r=D.rewards.find(x=>x.id===id);if(!r)return;
+  const re=['🎮','📱','🍕','🎬','🍦','🏞️','🌙','🎁','🎪','🚗','✈️','🎂','🌈','💎','🎭','🍰','🧸','🪁'];
+  let eg='';re.forEach(e=>eg+=`<span class="emoji-opt ${e===r.icon?'sel':''}" onclick="selE2(this,'${e}')">${e}</span>`);
+  showModal(`<div class="modal-title">Edytuj nagrode</div>
+    <div class="modal-field"><label>Nazwa</label><input type="text" id="wN" value="${r.name}"></div>
+    <div class="modal-field"><label>Ikona</label><div class="emoji-grid">${eg}</div><input type="hidden" id="wI" value="${r.icon}"></div>
+    <div class="modal-field"><label>Koszt (gemy)</label><input type="number" id="wC" value="${r.cost}" min="5" max="999"></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Anuluj</button><button class="mbtn-save" onclick="updateW('${id}')">Zapisz ✓</button></div>`);
+}
+function updateW(id){
+  const r=D.rewards.find(x=>x.id===id);if(!r)return;
+  const n=$('wN').value.trim();if(!n){showToast('Wpisz nazwe!');return}
+  r.name=n;r.icon=$('wI').value;r.cost=Math.max(5,Math.min(999,parseInt($('wC').value)||50));
+  save();closeModal();renderSettings();showToast('Zapisane! 🎁');
+}
 function delW(id){D.rewards=D.rewards.filter(r=>r.id!==id);save();renderSettings();showToast('Usunieto')}
 function confirmReset(){showModal(`<div class="modal-title">⚠️ Resetowac?</div><p style="text-align:center;color:var(--text3);margin-bottom:16px;font-weight:600">Wszystkie postepy beda usuniete!</p><div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Nie!</button><button class="mbtn-save" style="background:var(--red)" onclick="doReset()">Tak, resetuj</button></div>`)}
 function doReset(){localStorage.removeItem(SK);D=defaults();save();if(syncOK)saveToCloud();closeModal();updateTop();renderPath();showToast('Zresetowane')}
@@ -1223,7 +1267,7 @@ function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show')
     await loadFromCloud();
     updateTop();renderPath();
   }
-  setTimeout(()=>mascotSay(MSGS_G[Math.floor(Math.random()*MSGS_G.length)],4000),500);
+  const mg=msgsG();setTimeout(()=>mascotSay(mg[Math.floor(Math.random()*mg.length)],4000),500);
 })();
 </script>
 </body>
