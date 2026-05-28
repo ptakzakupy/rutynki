@@ -6,6 +6,7 @@
 <title>Rutynki ⭐</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -483,6 +484,69 @@ const MPL=['Styczen','Luty','Marzec','Kwiecien','Maj','Czerwiec','Lipiec','Sierp
 const DPL=['Pn','Wt','Sr','Cz','Pt','So','Nd'];
 function dk(d){d=d||new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 
+// ============================================
+// SUPABASE CLOUD SYNC
+// ============================================
+const SUPABASE_URL='https://egntevwzcsskvuhkarzs.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnbnRldnd6Y3Nza3Z1aGthcnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTM5OTcsImV4cCI6MjA5NTUyOTk5N30.lD0ODk5KPIWp1FXMAnvEPMDtF6GNbxhUB6dRFy5f9JA';
+let sb=null,syncOK=false,cloudReady=false,saveTmr=null;
+
+function initSync(){
+  if(SUPABASE_URL==='PLACEHOLDER_URL')return;
+  try{
+    sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    syncOK=true;
+    // Real-time: nasłuchuj zmian z innych urządzeń
+    sb.channel('sync').on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:'id=eq.family'},payload=>{
+      if(payload.new&&payload.new.data){
+        const remote=payload.new.data;
+        if((remote._ts||0)>(D._ts||0)){
+          D={...defaults(),...remote};
+          localStorage.setItem(SK,JSON.stringify(D));
+          updateTop();
+          const active=document.querySelector('.view.active');
+          if(active)render(active.id);
+          showToast('📡 Zsynchronizowano!');
+        }
+      }
+    }).subscribe();
+  }catch(e){syncOK=false}
+}
+
+async function loadFromCloud(){
+  if(!syncOK)return;
+  try{
+    const{data,error}=await sb.from('app_state').select('data').eq('id','family').single();
+    if(error&&error.code==='PGRST116'){
+      // Brak rekordu — wrzuć lokalny stan do chmury
+      D._ts=Date.now();
+      await sb.from('app_state').insert({id:'family',data:D});
+      cloudReady=true;return;
+    }
+    if(data&&data.data){
+      const remote=data.data;
+      const localTs=D._ts||0,remoteTs=remote._ts||0;
+      if(remoteTs>localTs){
+        D={...defaults(),...remote};
+        localStorage.setItem(SK,JSON.stringify(D));
+        updateTop();renderPath();
+        showToast('☁️ Dane z chmury zaladowane!');
+      }else if(localTs>remoteTs){
+        // Lokalny stan nowszy — wyślij do chmury
+        await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
+      }
+    }
+    cloudReady=true;
+  }catch(e){console.log('Cloud load error:',e)}
+}
+
+async function saveToCloud(){
+  if(!syncOK||!cloudReady)return;
+  try{
+    await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
+  }catch(e){}
+}
+
 // ---- Levels ----
 const LEVELS=[
   {name:'Zoltodziob',min:0},{name:'Odkrywca',min:200},{name:'Tropiciel',min:500},
@@ -614,7 +678,12 @@ function load(){
   try{const r=localStorage.getItem(SK);if(r){const p=JSON.parse(r);const d=defaults();return{...d,...p,skips:p.skips||{}}}}catch(e){}
   return defaults();
 }
-function save(){localStorage.setItem(SK,JSON.stringify(D))}
+function save(){
+  D._ts=Date.now();
+  localStorage.setItem(SK,JSON.stringify(D));
+  // Debounced cloud save (1s)
+  if(syncOK){clearTimeout(saveTmr);saveTmr=setTimeout(saveToCloud,1000)}
+}
 
 // ---- Nav ----
 const PARENT_PIN='2137';
@@ -1132,7 +1201,7 @@ function selE2(el,e){document.querySelectorAll('.emoji-opt').forEach(x=>x.classL
 function saveW(){const n=$('wN').value.trim();if(!n){showToast('Wpisz nazwe!');return}D.rewards.push({id:'w'+Date.now(),name:n,icon:$('wI').value,cost:Math.max(5,Math.min(999,parseInt($('wC').value)||50))});save();closeModal();renderSettings();showToast('Dodane! 🎁')}
 function delW(id){D.rewards=D.rewards.filter(r=>r.id!==id);save();renderSettings();showToast('Usunieto')}
 function confirmReset(){showModal(`<div class="modal-title">⚠️ Resetowac?</div><p style="text-align:center;color:var(--text3);margin-bottom:16px;font-weight:600">Wszystkie postepy beda usuniete!</p><div class="modal-btns"><button class="mbtn-cancel" onclick="closeModal()">Nie!</button><button class="mbtn-save" style="background:var(--red)" onclick="doReset()">Tak, resetuj</button></div>`)}
-function doReset(){localStorage.removeItem(SK);D=defaults();save();closeModal();updateTop();renderPath();showToast('Zresetowane')}
+function doReset(){localStorage.removeItem(SK);D=defaults();save();if(syncOK)saveToCloud();closeModal();updateTop();renderPath();showToast('Zresetowane')}
 
 // ---- Helpers ----
 function showModal(h){$('modalBox').innerHTML=h;$('modalBg').classList.add('active')}
@@ -1144,10 +1213,16 @@ function launchConfetti(){const c=$('confBox'),cols=['#58CC02','#FFC800','#1CB0F
 function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
 // ---- INIT ----
-(function(){
+(async function(){
   const today=dk();
   if(D._lastDay!==today){D._dayMaxCombo=0;D._lastDay=today;save()}
   calcStreak();updateTop();renderPath();
+  // Cloud sync
+  initSync();
+  if(syncOK){
+    await loadFromCloud();
+    updateTop();renderPath();
+  }
   setTimeout(()=>mascotSay(MSGS_G[Math.floor(Math.random()*MSGS_G.length)],4000),500);
 })();
 </script>
