@@ -505,7 +505,17 @@ function initSync(){
       if(payload.new&&payload.new.data){
         const remote=payload.new.data;
         if((remote._ts||0)>(D._ts||0)){
+          // Merge zamiast nadpisywania
+          const older=D;
           D={...defaults(),...remote};
+          D.routines=mergeById(remote.routines,older.routines);
+          D.rewards=mergeById(remote.rewards,older.rewards);
+          D.completions=mergeDaily(remote.completions||{},older.completions||{});
+          D.skips=mergeDaily(remote.skips||{},older.skips||{});
+          const achSet=new Set([...(remote.achievements||[]),...(older.achievements||[])]);
+          D.achievements=[...achSet];
+          D.longestStreak=Math.max(remote.longestStreak||0,older.longestStreak||0);
+          D._maxCombo=Math.max(remote._maxCombo||0,older._maxCombo||0);
           localStorage.setItem(SK,JSON.stringify(D));
           updateTop();
           const active=document.querySelector('.view.active');
@@ -517,12 +527,29 @@ function initSync(){
   }catch(e){syncOK=false}
 }
 
+// Merge tablice po ID — zachowuje elementy z obu zrodel
+function mergeById(local,remote){
+  const map=new Map();
+  (remote||[]).forEach(x=>map.set(x.id,x));
+  (local||[]).forEach(x=>map.set(x.id,x)); // lokalne nadpisuja remote jesli ten sam ID
+  return[...map.values()];
+}
+// Merge completions/skips — laczy unikalne ID per dzien
+function mergeDaily(local,remote){
+  const merged={...remote};
+  for(const k in local){
+    if(!merged[k])merged[k]=[];
+    const set=new Set([...merged[k],...local[k]]);
+    merged[k]=[...set];
+  }
+  return merged;
+}
+
 async function loadFromCloud(){
   if(!syncOK)return;
   try{
     const{data,error}=await sb.from('app_state').select('data').eq('id','family').single();
     if(error&&error.code==='PGRST116'){
-      // Brak rekordu — wrzuć lokalny stan do chmury
       D._ts=Date.now();
       await sb.from('app_state').insert({id:'family',data:D});
       cloudReady=true;return;
@@ -531,26 +558,44 @@ async function loadFromCloud(){
       const remote=data.data;
       const remoteTs=remote._ts||0;
       const localTs=D._ts||0;
-      // Sprawdz czy lokalne dane maja prawdziwa zawartosc (nie domyslne)
       const localReal=D.totalDone>0||D.xp>0||Object.keys(D.completions||{}).length>0||(D._userEdited);
       const remoteReal=(remote.totalDone||0)>0||(remote.xp||0)>0||Object.keys(remote.completions||{}).length>0||(remote._userEdited);
 
-      if(remoteTs>0&&(localTs===0||remoteTs>localTs)){
-        // Chmura ma nowsze dane — uzyj ich
+      if(remoteTs>0&&(localTs===0||!localReal)){
+        // Nowe urzadzenie lub brak lokalnych danych — bierz chmure
         D={...defaults(),...remote};
         localStorage.setItem(SK,JSON.stringify(D));
         showToast('☁️ Dane z chmury zaladowane!');
-      }else if(remoteReal&&!localReal&&localTs===0){
-        // Nowe urzadzenie — chmura ma dane, lokalne sa domyslne
-        D={...defaults(),...remote};
+      }else if(remoteTs>0&&localTs>0){
+        // Oba maja dane — MERGE zamiast nadpisywania
+        const newer=remoteTs>localTs?remote:D;
+        const older=remoteTs>localTs?D:remote;
+        // Wartosci numeryczne — bierz nowsze
+        D={...defaults(),...newer};
+        // Rutyny i nagrody — merge (nie gub dodanych elementow!)
+        D.routines=mergeById(newer.routines,older.routines);
+        D.rewards=mergeById(newer.rewards,older.rewards);
+        // Completions i skips — merge (nie gub zaznaczen!)
+        D.completions=mergeDaily(newer.completions||{},older.completions||{});
+        D.skips=mergeDaily(newer.skips||{},older.skips||{});
+        // Achievements — polacz unikalne
+        const achSet=new Set([...(newer.achievements||[]),...(older.achievements||[])]);
+        D.achievements=[...achSet];
+        // RewardHistory — polacz i deduplikuj po dacie+nazwie
+        const rhMap=new Map();
+        [...(older.rewardHistory||[]),...(newer.rewardHistory||[])].forEach(h=>rhMap.set(h.date+'_'+h.name,h));
+        D.rewardHistory=[...rhMap.values()];
+        // Najlepsze wartosci
+        D.longestStreak=Math.max(newer.longestStreak||0,older.longestStreak||0);
+        D._maxCombo=Math.max(newer._maxCombo||0,older._maxCombo||0);
+        D._ts=Date.now();
         localStorage.setItem(SK,JSON.stringify(D));
-        showToast('☁️ Dane z chmury zaladowane!');
-      }else if(localTs>remoteTs||(localReal&&!remoteReal)){
-        // Lokalne nowsze lub maja dane a chmura pusta — wyslij
+        await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
+        if(remoteTs>localTs)showToast('☁️ Dane zsynchronizowane!');
+      }else if(localReal&&!remoteReal){
         D._ts=Date.now();
         await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
       }else if(remoteTs===0&&localTs===0){
-        // Oba swieże — wyslij lokalne (pierwszy sync)
         D._ts=Date.now();
         await sb.from('app_state').update({data:D,updated_at:new Date().toISOString()}).eq('id','family');
       }
@@ -923,35 +968,33 @@ function toggleTask(id,event){
   if(!D.completions[today])D.completions[today]=[];
   if(!D.skips[today])D.skips[today]=[];
 
+  const idx=D.completions[today].indexOf(id);
+  const task=D.routines.find(r=>r.id===id);if(!task)return;
+
+  // Juz zrobione? Nie mozna cofnac (anty-exploit Gustawa 😎)
+  if(idx!==-1){playSound('click');return}
+
   // If skipped, unskip first
   const si=D.skips[today].indexOf(id);
   if(si!==-1)D.skips[today].splice(si,1);
 
-  const idx=D.completions[today].indexOf(id);
-  const task=D.routines.find(r=>r.id===id);if(!task)return;
   const prevLvl=getLevel(D.xp);
+  D.completions[today].push(id);
+  const mult=registerCombo();
+  const boost=D.xpBoostUntil&&Date.now()<D.xpBoostUntil;
+  const earned=task.pts*mult*(boost?2:1);
+  D.xp+=earned;D.gems+=Math.floor(earned/10)+1;D.totalDone++;
+  playSound('done');
+  showPtPop(event,`+${earned} XP${mult>1?' x'+mult:''}${boost?' 🚀':''}`);
+  const me=msgsE();mascotExpr('excited',600);mascotSay(me[Math.floor(Math.random()*me.length)],2000);
 
-  if(idx===-1){
-    D.completions[today].push(id);
-    const mult=registerCombo();
-    const boost=D.xpBoostUntil&&Date.now()<D.xpBoostUntil;
-    const earned=task.pts*mult*(boost?2:1);
-    D.xp+=earned;D.gems+=Math.floor(earned/10)+1;D.totalDone++;
-    playSound('done');
-    showPtPop(event,`+${earned} XP${mult>1?' x'+mult:''}${boost?' 🚀':''}`);
-    const me=msgsE();mascotExpr('excited',600);mascotSay(me[Math.floor(Math.random()*me.length)],2000);
+  if(getLevel(D.xp)>prevLvl)setTimeout(()=>showLevelUp(getLevel(D.xp)+1),500);
 
-    if(getLevel(D.xp)>prevLvl)setTimeout(()=>showLevelUp(getLevel(D.xp)+1),500);
-
-    const comp=D.completions[today],skps=D.skips[today];
-    if(comp.length+skps.length>=D.routines.length&&D.routines.length>0&&!D.chestOpened[today]){
-      setTimeout(()=>mascotSay('Wszystko ogarniesz! Otworz skrzynie! 🎁',4000),800);
-    }
-  }else{
-    D.completions[today].splice(idx,1);
-    D.xp=Math.max(0,D.xp-task.pts);D.gems=Math.max(0,D.gems-Math.floor(task.pts/10)-1);
-    D.totalDone=Math.max(0,D.totalDone-1);playSound('click');
+  const comp=D.completions[today],skps=D.skips[today];
+  if(comp.length+skps.length>=D.routines.length&&D.routines.length>0&&!D.chestOpened[today]){
+    setTimeout(()=>mascotSay('Wszystko ogarniesz! Otworz skrzynie! 🎁',4000),800);
   }
+
   calcStreak();checkAchs();checkQuests();save();updateTop();renderPath();
 }
 
@@ -1274,19 +1317,20 @@ function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show')
 
 // ---- INIT ----
 (async function(){
-  // 1. Pokaż UI natychmiast z localStorage
-  calcStreak();updateTop();renderPath();
-  // 2. Cloud sync PRZED jakimkolwiek save()
+  // 1. Pokaż UI natychmiast z localStorage (BEZ save!)
+  updateTop();renderPath();
+  // 2. Cloud sync NAJPIERW — żaden save() nie może lecieć przed tym
   initSync();
   if(syncOK){
     await loadFromCloud();
-    updateTop();
-    const active=document.querySelector('.view.active');
-    if(active)render(active.id);
   }
-  // 3. Dopiero teraz daily reset
+  // 3. TERAZ dopiero calcStreak/daily reset (mogą save'ować)
   const today=dk();
-  if(D._lastDay!==today){D._dayMaxCombo=0;D._lastDay=today;save()}
+  if(D._lastDay!==today){D._dayMaxCombo=0;D._lastDay=today;}
+  calcStreak();
+  updateTop();
+  const active=document.querySelector('.view.active');
+  if(active)render(active.id);
   const mg=msgsG();setTimeout(()=>mascotSay(mg[Math.floor(Math.random()*mg.length)],4000),500);
 })();
 </script>
